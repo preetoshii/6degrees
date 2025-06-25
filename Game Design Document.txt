@@ -1,0 +1,1135 @@
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+   ▄████████  ▄█  ▀████    ▐████▀      ████████▄     ▄████████    ▄██████▄     ▄████████    ▄████████    ▄████████    ▄████████ 
+  ███    ███ ███    ███▌   ████▀       ███   ▀███   ███    ███   ███    ███   ███    ███   ███    ███   ███    ███   ███    ███ 
+  ███    █▀  ███▌    ███  ▐███         ███    ███   ███    █▀    ███    █▀    ███    ███   ███    █▀    ███    █▀    ███    █▀  
+  ███        ███▌    ▀███▄███▀         ███    ███  ▄███▄▄▄      ▄███         ▄███▄▄▄▄██▀  ▄███▄▄▄      ▄███▄▄▄       ███        
+▀███████████ ███▌    ████▀██▄          ███    ███ ▀▀███▀▀▀     ▀▀███ ████▄  ▀▀███▀▀▀▀▀   ▀▀███▀▀▀     ▀▀███▀▀▀     ▀███████████ 
+         ███ ███    ▐███  ▀███         ███    ███   ███    █▄    ███    ███ ▀███████████   ███    █▄    ███    █▄           ███ 
+   ▄█    ███ ███   ▄███     ███▄       ███   ▄███   ███    ███   ███    ███   ███    ███   ███    ███   ███    ███    ▄█    ███ 
+ ▄████████▀  █▀   ████       ███▄      ████████▀    ██████████   ████████▀    ███    ███   ██████████   ██████████  ▄████████▀  
+                                                                              ███    ███                                        
+                                                                                                                          
+
+
+
+
+
+
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ ▗▄▖ ▗▖  ▗▖▗▄▄▄▖▗▄▄▖ ▗▖  ▗▖▗▄▄▄▖▗▄▄▄▖▗▖ ▗▖
+▐▌ ▐▌▐▌  ▐▌▐▌   ▐▌ ▐▌▐▌  ▐▌  █  ▐▌   ▐▌ ▐▌
+▐▌ ▐▌▐▌  ▐▌▐▛▀▀▘▐▛▀▚▖▐▌  ▐▌  █  ▐▛▀▀▘▐▌ ▐▌
+▝▚▄▞▘ ▝▚▞▘ ▐▙▄▄▖▐▌ ▐▌ ▝▚▞▘ ▗▄█▄▖▐▙▄▄▖▐▙█▟▌
+
+~ OVERVIEW ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+========================
+ABOUT
+========================
+Six Degrees is a game about word associations. It's a poetic-strategic exploration game where players traverse a network of interconnected words (like a Wiki) to reach a target word in the fewest steps possible. The game's structure is a hybrid between a logical taxonomy (like a tree of concepts) and a metaphorical social web (a network of associations). Each move is a click on a word within a definition, which reveals that word's own definition and related words. Every click forward counts as a step.
+
+
+========================
+GOAL OF THE GAME
+========================
+The objective is simple: reach the destination word in the fewest possible steps. The fewer the steps, the better your score. Six Degrees is both a reflective puzzle and a meditative journey — a game that rewards thoughtful connections and 'scalable / zoomable' traversable logic.
+
+
+========================
+CORE GAMEPLAY LOOP
+========================
+1. The player is shown a starting word and a destination word.
+2. Clicking the starting word opens its natural-language definition.
+3. In the definition, certain words are clickable: these may be parents, children, acquaintances, traits, or roles.
+4. Clicking on a linked word opens that word's definition.
+5. Every click forward increments the player's step count.
+6. The goal is to reach the destination word in the least number of steps possible.
+
+Polished features:
+- Show visited path as a breadcrumb trail (Backtracking rewinds time: it removes the steps taken after that point, encouraging experimentation and puzzle-solving without penalty)
+- Make it a "daily" game, with a new starting word and destination word each day. This is in sync globally, but allow a "Free Play" mode as well.
+- Add a "Share" button once you finish to share a screenshot of your score with your friends, along with a link to the game, to encourage virality.
+- Add a "Something missing in this definition?" button to allow players to suggest new words to add to the graph, to be used in later iteration of the game
+- Add difficulty slider to allow players to choose how far away the starting word is from the destination word
+
+
+
+========================
+ENVISIONED PLAYER STRATEGIES
+========================
+There are two core player archetypes:
+
+The Logician:
+- Navigates up to parent categories to access siblings
+- Uses structured inference: "If cat is an animal, and dog is too, I can get to dog by going up to animal first"
+- Values hierarchy, clarity, and precision
+
+The Poet:
+- Follows acquaintances, traits, and roles through contextual resonance
+- Moves by metaphor, emotion, cultural vibe: "Apple reminds me of knowledge... or Steve Jobs"
+- Values surprise, meaning, and personal logic
+
+Both Modes Can Succeed:
+Most players will mix both styles during a single game.
+
+Example Path: Destination = Stop Sign
+Logician's path (6 steps): Cat → Animal → Human → Civilization → Rules → Traffic Sign → Stop Sign
+Poet's path (6 steps): Cat → Night → Street → City → Crosswalk → Red Light → Stop Sign
+
+Both are valid. Both are beautiful. I hypothesise that making the best of both results in the highest score.
+
+
+
+
+========================
+DIFFICULTY TUNING
+========================
+Difficulty is tuned by controlling the number of steps the origin word is away from the destination.
+
+- A random destination word is selected first
+- Then, the game walks X steps away in a random direction through the existing graph to select an origin word. This ensures that the destination word is always reachable from the origin word.
+- X = difficulty level
+- Starting rule: All paths are built with 6 degrees of separation to match the game title
+- Later, modes like "Easy (4 degrees)" or "Hard (8+)" can be introduced
+
+
+
+
+
+
+
+
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+▗▖ ▗▖ ▗▄▖ ▗▄▄▖ ▗▄▄▄     ▗▄▄▄▖▗▖  ▗▖▗▄▄▖ ▗▄▄▄▖ ▗▄▄▖
+▐▌ ▐▌▐▌ ▐▌▐▌ ▐▌▐▌  █      █   ▝▚▞▘ ▐▌ ▐▌▐▌   ▐▌   
+▐▌ ▐▌▐▌ ▐▌▐▛▀▚▖▐▌  █      █    ▐▌  ▐▛▀▘ ▐▛▀▀▘ ▝▀▚▖
+▐▙█▟▌▝▚▄▞▘▐▌ ▐▌▐▙▄▄▀      █    ▐▌  ▐▌   ▐▙▄▄▖▗▄▄▞
+
+~ WORD TYPES ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+                                                          
+--.--|   ||,   .,---.    . . .,---.,---.,--. 
+  |  |---|||\  ||  _.    | | ||   ||---'|   |
+  |  |   ||| \ ||   |    | | ||   ||  \ |   |
+  `  `   '``  `'`---'    `-'-'`---'`   ``--' 
+(THING WORD)  
+
+
+========================
+WHAT IT IS
+========================
+- In Six Degrees, all primary nodes in the graph are called “Thing Words” — nouns that represent distinct entities, objects, systems, or concepts.
+- These words are the most common in the game and serve as both origin and destination points in traversal.
+- While all Thing Words share the same structural format, they may be be called "parent, child, sibling, or acquaintance" to describe how they relate to each other.
+  - A thing word is called a **parent** when it represents the most precise broader category of a thing.
+  - A thing word is called a **child** when it is a more specific example of another thing.
+  - A thing word is called a **sibling** when it is a parallel member of the same category (purely used for thinking about the game development and design)
+  - A thing word is called an **acquaintance** when it shares thematic, symbolic, or commonly associated meaning with another thing.
+
+
+
+========================
+DEFINITION SYSTEM
+========================
+Every Thing Word includes the following metadata, with its own parent (1), children (7), traits (7), acquaintances (7), and purposes (7).
+
+
+{
+  "word": "Cat",
+  "type": "thing"
+  "parent": "Animal",
+  "children": [
+    "Siamese",
+    "Tabby",
+    "Persian",
+    "Maine Coon",
+    "Sphynx",
+    "Ragdoll",
+    "Bengal"
+  ],
+  "traits": [
+    "independent",
+    "agile",
+    "curious",
+    "nocturnal",
+    "graceful",
+    "mysterious",
+    "affectionate"
+  ],
+  "acquaintances": [
+    "Dog",
+    "Mouse",
+    "Litter Box",
+    "Laser Pointer",
+    "Fur",
+    "Scratching Post",
+    "Couch"
+  ],
+  "purposes": [
+    "Companion",
+    "Pet"
+  ]
+}  
+
+
+========================
+CHILD
+========================
+- Children are more specific examples, types, or subcategory 'thing words' generated from a parent
+- Each child must satisfy the statement: "A [child] is a kind of [parent word]"
+- In player traversal, Children support downward movement in abstraction and help players zoom into more concrete ideas
+
+Examples:
+- "Animal" → Children: [in order of commonality] Dog, Cat, Bird, Fish, Horse, Cow, Elephant
+- "Tool" → Children: [in order of commonality] Hammer, Screwdriver, Wrench, Pliers, Saw, Drill, Tape Measure
+- "Emotion" → Children: [in order of commonality] Happy, Sad, Angry, Fear, Love, Surprise, Disgust
+
+
+
+========================
+PARENT
+========================
+- The Parent is the single most appropriate broader category that a a child word belongs to
+- Unlike children, which are generated based on their parents, parents are never generated from children, as generation is a one-way process.
+- In player traversal, clicking on a parent supports "upward" movement in abstraction and help players zoom out to more general words
+- The first parent, which has no parent of its own, is our God Word: "Thing"
+
+Examples:
+- "Cat" → Parent: Animal
+- "Sadness" → Parent: Emotion
+- "Hammer" → Parent: Tool
+- "Democracy" → Parent: System
+
+
+
+========================
+SIBLING
+========================
+- Siblings are words that share the same parent — they are parallel members of the same category.
+- For example, “Dog” and “Cat” would both be siblings if they were  the direct children of "Mammal.” 
+- Unlike parents, children, and acquaintances, siblings are never explicitly listed in a word’s metadata. Instead, they are inferred by moving up to a shared parent and then down into another child. This design encourages discovery and strategy: a player might wish to find a sibling in order to traverse 'horizontally', and may  “zoom out” to a shared parent and then “zoom in” to a different child.
+- The concept of siblings is mentioned here simply because it's useful for thinking about game development, design, and traversal strategy, but is not a direct part of a thing word’s metadata.
+
+Examples:
+- “Dog” and “Cat” → Siblings (both children of "Mammal")
+- “Hammer” and “Screwdriver” → Siblings (both children of “Tool”)
+- “Joy” and “Sadness” → Siblings (both children of “Emotion”)
+- “Democracy” and “Monarchy” → Siblings (both children of “System”)
+
+
+
+========================
+ACQUAINTANCE
+========================
+- Acquaintances are a type of Thing word generated based on lateral associations — thing words that most frequently co-occur in thought or experience, while not being siblings, parents, children, or synonyms.
+- Acquaintances are generated from the thing word and reflect intuitive, often emotional or symbolic associations — the kind of answer you might give to the question, “When I say X, you think…?” (as long as the answer is not a parent, child, sibling, or synonym). These connections arise from culture, metaphor, memory, story, or shared experience.
+- A word’s acquaintances often include symbolic opposites, poetic complements, or things that frequently co-occur in thought or experience ("9/11 and Osama Bin Laden")
+- Acquaintances are a key part of the “Poet’s Traversal Strategy,” as they allow players to warp across conceptual space — following emotional resonance, metaphorical logic, or cultural symbolism rather than strict hierarchy. They enable surprising yet satisfying leaps between ideas that may not be categorically related, but feel meaningfully connected.
+
+Examples:
+- “9/11” → Acquaintances: Osama Bin Laden, Twin Towers, Airplane, Collapse, War on Terror, Pentagon, NYC  
+- “Romeo” → Acquaintances: Juliet, Balcony, Poison, Tragedy, Youth, Mask, Dagger  
+- “Mirror” → Acquaintances: Reflection, Glass, Vanity, Gaze, Makeup, Face, Dressing Table  
+- “Crown” → Acquaintances: King, Queen, Throne, Jewels, Coronation, Scepter, Robe
+
+
+
+
+
+
+
+
+/// NEEDS WORK
+--.--,---.,---.|--.--    . . .,---.,---.,--. 
+  |  |---'|---||  |      | | ||   ||---'|   |
+  |  |  \ |   ||  |      | | ||   ||  \ |   |
+  `  `   ``   '`  `      `-'-'`---'`   ``--' 
+(TRAIT WORD)  
+                                        
+
+
+========================
+WHAT IT IS
+========================
+- Traits are adjectives — descriptive qualities like "agile," "loud," or "resilient"
+- Trait words function as BRIDGES between thing words, by nature of things that share those traits.
+- As they are pure qualitative bridges, they do not have parents or children. 
+
+========================
+EXAMPLES
+========================
+- "Cat" → Traits: [in order of commonality] Independent, Agile, Curious, Nocturnal, Graceful, Mysterious, Affectionate
+- "Ocean" → Traits: [in order of commonality] Vast, Deep, Powerful, Mysterious, Beautiful, Dangerous, Eternal
+- "Book" → Traits: [in order of commonality] Informative, Engaging, Portable, Durable, Valuable, Timeless, Transformative
+
+
+========================
+DEFINITION SYSTEM
+========================
+
+The metadata of traits comprise of a list of thing words within whose metadata the trait is listed. Unlike thing words which have pre-set metadata, metadata of traits are dynamically generated from the word graph, (on load or on demand?). The metadata of Traits words are not pre-defined entities but emerge from the graph. In order to generate the metadata of a trait, the system will search the graph for all words that list this trait.
+
+Because of this, during the initial graph build, traits are passively generated in each word's metadata alongside the other components, but are not defined during the initial stage. 
+- Only traits that are shared by two or more defined words will be promoted in a later pass to become formal bridge-nodes with their own trait definitions
+
+Example:
+{
+  "word": "Agile",
+  "type": "trait",
+  "exemplars": [
+    "Cat",
+    "Sprinter",
+    "Dancer",
+    "Gymnast",
+    "Falcon",
+    "Fencer",
+    "Parkour"
+  ],
+
+(Each of those words shared betweem two or more thing words' definitions)
+
+Example of a Trait's Natural Language Definition:
+"Agile describes a quality of quick, graceful movement. It's a trait shared by [Cats], known for their natural [Agility], [Sprinters] who train for [Speed], and [Dancers] who master [Grace]. This trait connects to ideas of [Movement] and [Precision]."
+.
+Note: The exact words and connections shown will depend on what exists in the current graph. As more words are added to the system, the trait's definition and connections will naturally grow richer.
+
+
+
+
+
+
+
+
+
+/// NEEDS WORK                                                
+,---.,---.|    ,---.    . . .,---.,---.,--. 
+|---'|   ||    |---     | | ||   ||---'|   |
+|  \ |   ||    |        | | ||   ||  \ |   |
+`   ``---'`---'`---'    `-'-'`---'`   ``--' 
+                                            
+                                                           
+========================
+WHAT IT IS
+========================
+- Role Words are functional or purpose-centered concepts that describe what a Thing is for, or what it does in the world.
+- They can take two common forms:
+  • Gerund Nouns (e.g. “Cutting,” “Healing,” “Teaching”) — action-like roles
+  • Abstract Nouns (e.g. “Companionship,” “Protection,” “Guidance”) — value- or experience-based roles
+- Role Words act as BRIDGES between Thing Words that fulfill similar purposes, even if they come from different branches of the taxonomy.
+- Like Traits, Role Words are non-hierarchical: they do not have parents or children.
+- However, unlike Traits, Role Words are defined by not only their EXEMPLARS, but also by their ACQUAINTANCES.
+
+========================
+EXAMPLES
+========================
+- "Scissors" → Roles: Cutting, Separating
+- "Dog" → Roles: Companionship, Guarding, Herding
+- "Therapist" → Roles: Guiding, Healing
+- "Sword" → Roles: Fighting, Cutting, Protecting
+- "Alarm Clock" → Roles: Waking, Alerting
+
+========================
+DEFINITION SYSTEM
+========================
+
+Role Word metadata is composed of:
+• exemplars — Thing Words that list the Role in their metadata
+• acquaintances — symbolic, cultural, or experiential associations related to the role itself (optional, but encouraged)
+
+Role Words are seeded during Phase 1: when a Thing Word is created, up to 7 salient Role Words may be generated to describe its purpose. These roles are initially stored as string literals within the Thing’s metadata, just like Traits and Acquaintances.
+
+Then, in a later phase, we promote each unique Role Word into its own node if it appears in two or more Thing Words. This ensures roles are real bridges, not one-off metadata fragments.
+
+Example:
+{
+  "word": "Cutting",
+  "type": "role",
+  "exemplars": [
+    "Scissors",
+    "Knife",
+    "Scalpel",
+    "Sword",
+    "Chainsaw"
+  ],
+  "acquaintances": [
+    "Sharpness",
+    "Separation",
+    "Precision",
+    "Motion",
+    "Blade"
+  ]
+}
+
+Example of a Role Word’s Natural Language Definition:
+"Cutting is a purposeful action associated with sharpness, separation, and precision. It’s a function shared by tools like scissors, knives, scalpels, and swords—each designed to divide, shape, or sever materials."
+
+Note: Abstract Role Words follow the same structure, but the natural language definition would have more emphasis on emotional or relational context.
+
+Example:
+{
+  "word": "Companionship",
+  "type": "role",
+  "exemplars": [
+    "Dog",
+    "Friend",
+    "Pet",
+    "Caregiver"
+  ],
+  "acquaintances": [
+    "Loyalty",
+    "Presence",
+    "Support",
+    "Closeness",
+    "Love"
+  ]
+}
+
+"Companionship is a human-centered experience associated with loyalty, presence, and emotional closeness. It’s a role fulfilled by beings like dogs, friends, pets, and caregivers—offering comfort, connection, and belonging."
+
+As with Traits, Role definitions grow richer as the graph expands. Role Words help players traverse via function, purpose, or effect—revealing why something exists, not just what it is.
+
+
+
+
+
+
+
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+▗▄▄▄▖▗▖ ▗▖▗▄▄▄▖    ▗▖ ▗▖ ▗▄▖ ▗▄▄▖ ▗▄▄▄     ▗▄▄▄▖▗▄▄▖ ▗▄▄▄▖▗▄▄▄▖
+  █  ▐▌ ▐▌▐▌       ▐▌ ▐▌▐▌ ▐▌▐▌ ▐▌▐▌  █      █  ▐▌ ▐▌▐▌   ▐▌   
+  █  ▐▛▀▜▌▐▛▀▀▘    ▐▌ ▐▌▐▌ ▐▌▐▛▀▚▖▐▌  █      █  ▐▛▀▚▖▐▛▀▀▘▐▛▀▀▘
+  █  ▐▌ ▐▌▐▙▄▄▖    ▐▙█▟▌▝▚▄▞▘▐▌ ▐▌▐▙▄▄▀      █  ▐▌ ▐▌▐▙▄▄▖▐▙▄▄▖
+  
+  HOW IT WORKS
+                                                                              
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+=================================
+GROWING THE WORD GRAPH LIKE A TREE
+==================================      
+Building the Six Degrees word graph is the most technically and conceptually challeging part of this game's development. It’s the creation of a living semantic ecosystem that mirrors how people actually think. When you simply dump a list of disconnected words and bolt on relationships afterward (as I initially tried), the result is a patchwork collage. Definitions feel awkward or forced, with words shoehorned into places they don’t naturally belong. Cohesion breaks down, meaningful paths disappear, and the system fails to honor the player’s intuition, strategies, or associations. Players quickly become disillusioned and abandon logical or poetic strategies in favor of random clicking, which feels more like a game of chance than a meaningful use of one's own associative thinking.
+
+As such, the better approach is to GROW the word graph. Basically, we build every word by extending from what already exists, never by retrofitting or shoehorning. We start at the GOD WORD which has no parent (“Thing”), generate that word’s children, then each child’s children, and so on, exponentially.
+
+This unidirectional root-to-leaf process, which mirrors real-life growth, ensures that:
+	1.	Integration Is Automatic: Each new word slots into a coherent lineage rather than forcing you to manually link or justify every relationship retroactively.
+	2.	Paths Are Real: This 'hidden consistency' allows the player to build intuition over how this~ underlying map works, because it follows natural organic patterns. This, in turn, allows the building of strategies, whether conscious or subconscious.
+	3.	Player Intuition Is Honored: Whether you’re scaling the hierarchy like a logician or leaping via poetic resonance—because the structure itself grew to reflect natural thought patterns.
+
+
+But this is all well and godo when we're thinking about parents and children, but what about acquaintances, traits, and roles? 
+
+
+==============================================================
+THE AQUAINTANCE CHALLENGE (aka the Orphan Problem)
+===============================================================
+So as we mentioned, we want to build a beautiful, clean system for growing a semantic graph. It starts with a broad concept like "Thing," and then grows outward — parent to children, children become parents, and so on, exponentially. This approach is hierarchical, elegant, and very stable. It's like growing a tree in one direction: you always know where a node came from and where it sits in the larger structure.
+
+But then comes Acquaintances. These are not part of the family tree structure of children and parents — they're based on how humans naturally associate ideas in the mind. When people think of "Yin," they inevitably think of "Yang." Not because "Yang" is a child or parent of "Yin," but because they co-exist in the same cultural or symbolic space. This is the kind of link that makes the game feel intuitive, human, and resonant (AKA The Poet's Strategy). It's what lets people feel like their minds are being seen.
+
+The problem is: when you include an acquaintance like "Yang" in the definition for "Yin," you now have to create "Yang" as a node. But Yang doesn't yet exist. And worse — you didn't get to Yang through the normal parent-child growth process. So now you have an undefined word dangling off the side of your clean tree. And you're faced with a tricky decision: do you generate a new parent for Yang (which might create instability as you have to retroactively justify the new parent), or do you try to ADOPT Yang into a parent of the tree that already exists (which might not be semantically ideal)? Neither option is great — and the reason is that the structure wasn't designed to grow backward.
+
+Acquaintances are essential for making the game feel alive, but they break the clean growth model unless we handle them carefully.
+
+The Solution? FINDING ADOPTIVE PARENTS
+
+When a Thing Word generates an Acquaintance—so “9/11” generates Osama Bin Laden—it can leave us with a dangling node outside our tidy parent-child tree. Rather than inventing a new parent for “Osama Bin Laden” (which would force backwards growth and potentially threaten stability), we find an existing parent in our system to ADOPT every Acquaintance (Political Figures)
+
+1.	Two-Phase Process
+	•	Phase One: As we expand from the root (“Thing”) through roughly 2,000 Thing Words, each thing word generates seven Acquaintances in its metadata — but none enter the tree yet.
+	•	Phase Two: Once that core graph is complete, we revisit every unique Acquaintance term.
+
+2.	Clean Adoption
+	•	Existing Node: If the Acquaintance already exists as a Thing Word, we simply link to it—no new hierarchy is created.
+	•	New Node: If it doesn’t exist, we generate the Acquaintance exactly once and find an adoptive  parent by asking the LLM to choose the most semantically precise category from our established list. 
+
+At first glance, slapping a new Acquaintance under an existing parent sounds like the same retroactive patchwork we feared—but in practice, it may not be the case, because:
+	•	Rich Taxonomic Coverage: With a mature tree of potentially ~2,000 Thing Words spanning a diverse range of parents, it seems rare to land on an orphan that truly lacks a parent.
+	•	Specificity-First Matching: Our LLM prompt explicitly asks for the most precise parent available. Only when no close fit exists does the term fall back to a higher-level category. So worst case, there's still a relevant category even if it's not the most specific.
+	•	Constrained Choice: By limiting the adoption to an established list, we eliminate the “anything goes” risk. The model can’t invent random parents; it only picks from proven, player-tested categories.
+
+By capturing Acquaintances early and adopting them only after the tree has matured, we preserve the forward-growing integrity of our taxonomy while still allowing the lateral, poetic connections that make the game feel alive and intuitive. Each new link then feels natural—whether you’re scaling the hierarchy or following a resonant leap—because it’s been slotted exactly where it belongs.
+
+This is a hypothesis that has yet to be tried. 
+
+
+
+==============================================================
+HOW ARE TRAITS HANDLED?
+===============================================================
+Traits in Six Degrees occupy a special “bridge” role—they connect Thing Words by shared qualities without becoming part of the strict parent–child hierarchy. Here’s the end-to-end flow for traits:
+1.	Passive Collection During Growth
+	•	As each Thing Word is added (parent → children), up to seven descriptive adjectives are logged in its metadata—e.g. “agile,” “mysterious,” “resilient.”
+	•	At this stage, traits remain inert strings alongside children and acquaintances; they do not create branches in the tree.
+2.	Synonym Normalization & Clustering
+	•	Once the core graph (~2,000 words) is complete, we gather all raw trait labels and run a semantic-similarity pass:
+	•	Embedding Clustering: Group labels whose embeddings exceed a similarity threshold.
+	•	Lexical Normalization: Apply a synonym dictionary (e.g. WordNet) to merge obvious equivalents (“agile” ≈ “nimble”).
+	•	Within each cluster, we pick a single canonical label—the most frequent or clearest term.
+3.	Promotion to Trait Words
+	•	We count occurrences of each canonical label. Only those appearing in two or more Thing Word metadata lists are elevated into standalone Trait Word nodes.
+	•	This guarantee of ≥2 links prevents single-use—orphan—traits.
+4.	Trait Word Structure
+	•	No Parents or Children: Traits exist outside the taxonomy tree.
+	•	Metadata: A ranked list of all Thing Words that exhibit the trait.
+	•	Optional Lateral Links: Traits may list related traits as acquaintances to each other.
+5.	Dynamic Definition Rendering
+	•	When a player clicks a Trait Word, the game engine:
+    	•	Retrieves and ranks all associated Thing Words by frequency.
+    	•	Generates a natural-language description on the fly using those examples.
+	•	As new Thing Words join the graph, their traits feed back into this pipeline—Trait definitions evolve automatically without manual intervention.
+
+
+/// NEEDS WORK                                                
+
+==============================================================
+HOW ARE ROLES HANDLED?
+===============================================================
+Roles in Six Degrees describe the functional or intentional use of a Thing — what it does, or what it’s for. They, like traits, ALSO serve as semantic bridges between otherwise unrelated Thing Words that share a common purpose, and they enable functional traversal through the graph. Unlike Traits, which describe inherent qualities, Roles are about external intent or effect.
+
+Critically, not every Thing Word has a salient role. Roles are only included for Thing Words whose function is a core part of their identity — e.g., “Scissors” (cutting), “Guru” (guiding), “Dog” (companionship). This helps avoid overfitting or forcing a purpose where none meaningfully exists.
+
+1. Selective Role Generation During Growth  
+    • In Phase 1, every Thing Word is evaluated for whether it warrants Roles at all.  
+    • Only if a functional use is central to its meaning does the system generate 7 candidate Role labels (e.g. “cutting,” “healing,” "companionship," "guidance" etc). Be picky about which words Role Words are generated for.  
+    • These role strings are stored in the Thing’s metadata under a `purposes` array, alongside traits and acquaintances.  
+    • Many Thing Words — like “Cloud” or “Beauty” — may have no roles at all, and that’s fine.
+
+2. Canonicalization & Filtering  
+    • After tree growth, all raw purpose strings are normalized:
+        • Lowercased, singularized, deduplicated
+        • Merged using embeddings and lexical synonym rules (e.g. “cutting” ≈ “slicing”?)
+    • Any Role label found in ≥2 distinct Thing Words is promoted to become a Role Word.
+    • Roles with only one source are discarded — this avoids cluttering the graph with overly narrow or redundant concepts.
+
+3. Role Word Structure  
+    • Like Traits, Role Words are stand-alone bridge nodes. They have:
+        • `exemplars`: all Thing Words that listed the Role in their metadata  
+        • `acquaintances`: optional — symbolic or functional associates of the Role  
+    • They do not have children or parents, and are not part of the parent-child hierarchy.
+
+4. Acquaintance Handling for Roles  
+    • Role Words can have their own symbolic or functional acquaintances (e.g. “Cutting” → Sharpness, Blade, Precision).
+    • These are handled using the same adoption strategy as for Thing Words:  
+        • If the acquaintance exists → link it  
+        • If not → adopt it under a semantically suitable parent
+
+5. Dynamic Definition Rendering  
+    • Role definitions are written using:
+        • Exemplars (e.g. “Scissors,” “Razor,” “Knife”)
+        • Acquaintances (e.g. “Separation,” “Edge,” “Blade”)
+    • These produce natural-language definitions like:
+        "Cutting is a purposeful act of separating material using an edge or blade. It's a role performed by tools like scissors, razors, and knives—each designed for precision and sharpness."
+
+    • Abstract or social Roles (e.g. “Companionship,” “Healing”) follow the same pattern, using emotionally resonant acquaintances:
+        "Companionship is the role of offering presence, loyalty, and mutual connection. It's fulfilled by dogs, friends, and partners, often tied to ideas of warmth, trust, and shared life."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+🧠 Why This Matters
+
+• Role Words introduce intent, use, and social function into the semantic map — enabling movement not just by category or trait, but by what things are for.
+• Roles are especially important for tools, social beings, professions, and systems with an active function.
+• But by requiring functional salience (i.e. only assigning Roles when they're central), the game avoids artificial or bloated metadata.
+• Roles give players a new strategic traversal dimension: function.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+📎 Notes
+
+• Roles are only generated when the Thing Word is clearly purpose-centered.  
+• Role Words do not have parents or children.  
+• Their definitions are constructed from exemplars and acquaintances — not hierarchy.  
+• They may have their own `acquaintances`, which flow through the same Phase 3 adoption process.  
+• This makes them feel consistent with the system while enabling a distinct mode of navigation.
+
+
+
+
+/// STILL NEEDS TO INCLUDE ROLES                                                
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+▗▄▄▖ ▗▖ ▗▖▗▄▄▄▖▗▖   ▗▄▄▄     ▗▄▄▄▖▗▖    ▗▄▖ ▗▖ ▗▖    ▗▄▄▄▖▗▄▄▄ ▗▄▄▄▖ ▗▄▖ 
+▐▌ ▐▌▐▌ ▐▌  █  ▐▌   ▐▌  █    ▐▌   ▐▌   ▐▌ ▐▌▐▌ ▐▌      █  ▐▌  █▐▌   ▐▌ ▐▌
+▐▛▀▚▖▐▌ ▐▌  █  ▐▌   ▐▌  █    ▐▛▀▀▘▐▌   ▐▌ ▐▌▐▌ ▐▌      █  ▐▌  █▐▛▀▀▘▐▛▀▜▌
+▐▙▄▞▘▝▚▄▞▘▗▄█▄▖▐▙▄▄▖▐▙▄▄▀    ▐▌   ▐▙▄▄▖▝▚▄▞▘▐▙█▟▌    ▗▄█▄▖▐▙▄▄▀▐▙▄▄▖▐▌ ▐▌
+BUILD FLOW IDEA
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+I know this section seems very specific, but this is the overall idea for how to actually build all this. In practice, perhaps there are some things that need to be tweaked, or a few mistakes in here, or maybe it's not fully robust enough. But this is a good reference for the overall idea I'm thinking about for how to build flow, and at the very least, maybe it can serve as inspiration for the true strategy that might devel in the process of building it. Don't take it as gospel, use your own intelligence to really ensure everything will work, but use this as solid inspiration of how we might go about this.
+
+
+---------------------
+
+🌳 PHASE 1: CORE TREE GROWTH
+
+Goal: Grow a cohesive parent→child taxonomy of main Thing Words (parents & children), while logging raw traits & acquaintances (no promotions yet).
+
+1. Initialize Artifacts  
+   🎲 master_words.json ←  
+      [  
+        {  
+          word: "Thing",  
+          type: "thing",  
+          parent: null,  
+          children: [],  
+          traits: [],  
+          acquaintances: [],  
+          stages: {  
+            childrenDone: false,  
+            rawLogged:  false  
+          }  
+        }  
+      ]  
+   📝 raw_traits.csv        ← empty (columns: word,trait)  
+   📝 raw_acquaintances.csv ← empty (columns: word,acquaintance)  
+
+2. BFS Expansion Loop  
+   ⏳ targetCount ← 2000  
+   ➡️ queue ← ["Thing"]  
+
+   While (queue not empty) AND (master_words.json.length < targetCount):  
+     a. Dequeue → currentWord  
+     b. Lookup record = master_words.json.find(w==currentWord)  
+        • If record.stages.childrenDone == true → continue  
+     c. Build exclusion lists:  
+        • parentTerm   = record.parent  
+        • childTerms   = record.children  
+        • traitTerms   = raw_traits.csv.filter(w==currentWord).map(t)  
+        • synonymTerms = synonyms_of(currentWord)  # e.g. WordNet lookup  
+     d. **Generate via three separate LLM calls (GPT-4 Turbo)**:  
+        1) **Children Prompt**  
+           “List exactly 7 common subtypes of [currentWord], ranked by commonality.  
+            Return 7 comma-separated nouns only.”  (actual prompt in prompts/children generation.txt)
+           ↪️ Retry up to 2× if count≠7 or format invalid.  
+        2) **Traits Prompt**  
+           “List exactly 7 adjectives most people associate with [currentWord], ranked by frequency.  
+            Return 7 comma-separated words only.”   (actual prompt in prompts/trait generation.txt)
+           ↪️ Retry if needed.  
+        3) **Acquaintances Prompt**  
+           “List exactly 7 nouns that co-occur with [currentWord] in thought/experience,  
+            excluding [parentTerm], [childTerms], [traitTerms], [synonymTerms].  
+            Return 7 comma-separated nouns only.”  (actual prompt in prompts/acquaintance generation.txt)
+           ↪️ Retry if exclusions appear or count≠7.  
+     e. **Mark children as done**  
+        • record.stages.childrenDone = true  
+        • Persist master_words.json  
+     f. **Normalize & Deduplicate Children**  
+        For each childCandidate:  
+          norm = lowercase(singularize(childCandidate))  
+          if (!master_words.json.find(w ⇒ normalize(w.word)==norm)):  
+            – append newRecord {  
+                word: childCandidate, type:"thing", parent:currentWord,  
+                children:[], traits:[], acquaintances:[],  
+                stages:{ childrenDone:false, rawLogged:false }  
+              }  
+            – enqueue childCandidate  
+          if (childCandidate ∉ record.children):  
+            – record.children.push(childCandidate)  
+     g. **Write Raw Metadata**  
+        • append (currentWord, trait) → raw_traits.csv  
+        • append (currentWord, acq)   → raw_acquaintances.csv  
+     h. **Mark raw logging as done**  
+        • record.stages.rawLogged = true  
+        • Persist master_words.json  
+     i. **Throttle & Back-off**  
+        • Sleep 50–100 ms between calls  
+        • On HTTP 429 → exponential back-off  
+
+3. Output after Phase 1  
+   ✅ master_words.json (~2 000 entries), each:  
+     {  
+       "word":         "Cat",  
+       "type":         "thing",  
+       "parent":       "Animal",  
+       "children":     ["Siamese","Tabby",…],   # 7 items  
+       "traits":       [],                      # placeholders  
+       "acquaintances": [],                     # placeholders  
+       "stages": {                              
+         "childrenDone": true,  
+         "rawLogged":    true  
+       }  
+     }  
+   ✅ raw_traits.csv & raw_acquaintances.csv capture every (word,trait)/(word,acq) pair  
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━  
+🛠 TECH: Model, Why & Cost Estimate  
+   • Model: **GPT-4 Turbo**  
+     – Crisp list-only output, massive 128 K token window, ~½ GPT-4o cost  
+   • Cost Estimate: 6 000 calls × ~100 tokens ≈ 600 000 tokens → ≈\$2.55 total for Phase 1  
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━  
+🔄 Resumable & Idempotent Processing  
+• All state lives in master_words.json under each node’s `stages` flags.  
+• On crash/restart, rebuild queue from any words where either flag == false.  
+• No separate “seen” set needed—JSON is the single source of truth.  
+
+🚑 Crash Recovery & Re-Runs  
+• Safe to re-run; uncompleted nodes pick up exactly where they left off.  
+• A small “reset” script can clear all `stages` flags if you want a fresh run.  
+
+✅ Benefits  
+• Guarantees no half-finished nodes are skipped or re-processed.  
+• Workflow state & data remain tightly coupled.  
+• Fully crash-safe, retry-safe, and transparent to any maintainer.  
+
+
+🔗 LINKING STRATEGY (applies from Phase 1 onward)
+	•	Front-end should dynamically render any word found in a node’s:
+• parent
+• children
+• traits
+• acquaintances
+as a clickable link in the definition.
+	•	These are guaranteed to exist in the metadata regardless of whether the node has received a Phase 4 natural-language definition or is still showing raw JSON metadata.
+	•	This eliminates the need to insert markup or hyperlinks into the raw text returned by the model.
+
+
+
+------------------------------------
+
+
+
+🧬 PHASE 2: TRAIT SYNONYM NORMALIZATION & PROMOTION  
+
+Goal: Collapse redundant raw adjectives into canonical Trait Words, then promote only those shared by ≥ 2 Thing Words — all in a resumable, idempotent pass.
+
+1. Load Raw Traits  
+   📝 Read `raw_traits.csv` → list of `(word, rawTrait)` pairs.  
+
+2. Ensure Stage Flag  
+   🔖 In `master_words.json`, every node must have:  
+     `"stages": { …, "traitsPromoted": false }`  
+
+3. Preprocess & Cluster Labels  
+   a. **Label Cleanup**  
+      • Lowercase, strip punctuation, singularize/pluralize.  
+      • Build unique set `allRawTraits`.  
+   b. **Embedding Clustering**  
+      • Compute embeddings for each label (e.g. `text-embedding-ada-002`).  
+      • Run agglomerative clustering at similarity threshold ~0.8.  
+   c. **Synonym Merge**  
+      • Within each cluster, use WordNet or a custom map to merge obvious equivalents.  
+
+4. Select Canonical Labels  
+   🔄 For each cluster:  
+     • Choose the label with highest raw frequency (tie → shortest) → `canonicalTrait`.  
+     • Build map `rawToCanonical[rawTrait] = canonicalTrait`.  
+
+5. Normalize & Attach  
+   🔄 For each `(word, rawTrait)` in `raw_traits.csv`:  
+     • `canonical = rawToCanonical[rawTrait]`  
+     • Append `(word, canonical)` to an in-memory list or `traits_normalized.csv`.  
+
+6. Count & Promote Traits  
+   ➡️ Group normalized pairs by `canonical`, count **distinct** words:  
+     • If count ≥ 2 **and** for all exhibitor nodes `stages.traitsPromoted == false`:  
+       a. Add a Trait node in `traits_master.json`:  
+          ```json
+          {
+            "word":          "<canonicalTrait>",
+            "type":          "trait",
+            "exhibitors":    [/* sorted list of Thing Words */],
+            "related_traits": []
+          }
+          ```  
+       b. For each exhibitor in `master_words.json`, push `<canonicalTrait>` into its `traits` array.  
+       c. Set each exhibitor’s `stages.traitsPromoted = true`.  
+
+7. Persist & Resume Safety  
+   • After each cluster promotion, write out updated `traits_master.json` and `master_words.json`.  
+   • On restart, skip any Thing Word where `stages.traitsPromoted == true`.  
+
+8. Output after Phase 2  
+   ✅ `traits_master.json` — final Trait Word definitions.  
+   ✅ Updated `master_words.json` — all Thing Words now list canonical traits.  
+
+
+🛠 TECH: Approach, Why & Cost Estimate  
+
+• **Embedding Model**  
+  – Model: `text-embedding-ada-002`  
+  – Why: Fast, cost-efficient semantic vectors ideal for clustering hundreds of short labels.  
+  – Cost: $0.0004 per 1K tokens → ~500 labels × 1 token ≈ 500 tokens → **\$0.0002** total.  
+
+• **Clustering & Synonym Merge**  
+  – Library: scikit-learn’s AgglomerativeClustering (no API cost).  
+  – Synonym map via WordNet or custom dictionary (zero extra cost).  
+
+• **LLM Calls**  
+  – **None required** in Phase 2—everything runs locally after embeddings.  
+  – (Optional) GPT-4 Turbo validation: ~100 tokens/cluster × ~50 clusters ≈ 5 000 tokens → **\$0.02**.  
+
+• **Total Cost Estimate**  
+  – Embeddings pass: **\$0.0002**  
+  – Optional cluster-validation: **\$0.02**  
+  – **Grand Total:** < \$0.05  
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  
+🔍 **Key Essentials**  
+1. **Idempotency via `traitsPromoted` flags**  
+2. **Embedding-based clustering** (threshold ~0.8)  
+3. **Promote only traits ≥ 2 exhibitors**  
+4. **Persistent writes after each promotion**  
+5. **Resumable on crash/restart**  
+
+These steps ensure Phase 2 is reliable, repeatable, and crash-safe.  
+
+------------------------------------
+
+🤝 PHASE 3: ACQUAINTANCE ADOPTION & INTEGRATION
+
+Goal: Ensure every “Acquaintance” word hangs from the main taxonomy rather than dangle as an orphan, while preserving the natural, organic hierarchy we built in Phase 1. We use an embeddings-to-shortlist + LLM final vote approach to guarantee both high coverage and semantic precision.
+
+1. Load Raw Acquaintances  
+   📝 Read `raw_acquaintances.csv` → list of `(sourceWord, acqTerm)` pairs.  
+   ‣ Rationale: Having all logged pairs in memory lets us see which Thing Words reference each acquaintance.  
+
+2. Build Unique Acquaintance Set  
+   🎯 `allAcqs = unique(acqTerm)`  
+   ‣ Rationale: Deduplicating here avoids redundant work—each new term only needs a parent assigned once.  
+
+3. Seed Orphan Placeholders  
+   For each `acq` in `allAcqs`:  
+     • If `acq` already exists in `master_words.json` → skip.  
+     • Else → append placeholder node to `master_words.json`:  
+       ```json
+       {
+         "word":          "<acq>",
+         "type":          "thing",
+         "parent":        null,
+         "children":      [],
+         "traits":        [],
+         "acquaintances": [],
+         "stages":        { /* inherit or initialize flags */ }
+       }
+       ```  
+     ‣ Rationale: Placeholders let us assign parents in bulk before wiring up lateral links.  
+
+4. Prepare Embeddings Search  
+   • `parentCandidates = master_words.json.map(w ⇒ w.word + " — parent:" + w.parent + "; children:" + w.children.slice(0,3).join(", "))`  
+   • Compute embeddings for each extended candidate string **and** for each raw `acq` term using `text-embedding-ada-002`.  
+   ‣ Rationale: Embedding the word plus minimal context (parent, a few children) biases similarity toward true categories.  
+
+5. Build Shortlists via Nearest Neighbors  
+   For each orphan `acq`:  
+     a. Compute cosine similarity vs. all `parentCandidates`.  
+     b. Select top 20 most similar candidates → `shortlist[acq]`.  
+   ‣ Rationale: A top-20 shortlist almost always contains the correct parent—cuts LLM calls by ~95%.  
+
+6. LLM-Guided Final Parent Selection  
+   For each `acq` + its `shortlist`:  
+     • Prompt GPT-4 Turbo:
+       ```
+       I have 20 potential parent categories for “[acq]”:
+       • cand1, cand2, …, cand20
+
+       Which single category best serves as the parent for “[acq]”?  
+       Reply with exactly one choice from the list.
+       ```  
+     • If response ∉ shortlist → retry once.  
+     • Assign `chosenParent = response`.  
+   ‣ Rationale: LLM picks the most precise fit from a semantically-filtered set—minimizing hallucination.  
+
+7. Persist Parent Assignments (Bidirectional)  
+   • Update each orphan node’s `parent = chosenParent` in `master_words.json`.  
+   • Then locate the `chosenParent` node and push `acq` into its `children` array (if not already present).  
+   • Write out updated JSON.  
+   ‣ Rationale: Ensures bidirectional consistency—parents know their children and vice versa.  
+
+8. Attach Acquaintance Edges  
+   For each `(sourceWord, acq)` in `raw_acquaintances.csv`:  
+     • Locate `sourceWord` node → push `acq` onto its `acquaintances` array (if missing).  
+   • Persist `master_words.json`.  
+   ‣ Rationale: Now every Thing Word correctly references its lateral connections.  
+
+9. (Optional) Prune Duplicate Acquaintances  
+   • Cluster near-identical nodes (e.g. “Color” vs. “Colour”), merge them, rewrite links.  
+   ‣ Rationale: Keeps graph clean—skip unless obvious duplicates appear.  
+
+10. Output after Phase 3  
+   ✅ `master_words.json` updated:  
+     – Every orphan “Thing Word” has a valid `parent`.  
+     – Every original Thing Word’s `acquaintances` array is filled.  
+     – Every adopted child is correctly listed in its parent’s `children` array.  
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━  
+🛠 TECH: Hybrid Approach, Why & Cost  
+
+• **Embeddings Pass**  
+  – Model: `text-embedding-ada-002`  
+  – Purpose: Build a shortlist >95% likely to include true parent.  
+  – Cost: ~$0.0004 per 1K tokens → 2 000 candidates + contexts ≈\$0.002 total.  
+
+• **Nearest-Neighbor Search**  
+  – Library: Faiss or `sklearn.neighbors` (no API cost).  
+  – Purpose: Quickly retrieve top-K similar candidates per orphan.  
+
+• **LLM Final Vote**  
+  – Model: GPT-4 Turbo  
+  – Prompt size: ~100 tokens/orphan → 2 000 orphans → 200 000 tokens.  
+  – Cost: 200 000 tokens × \$0.004/token ≈ **\$0.80**.  
+
+• **Total Phase 3 Estimate**  
+  – Embeddings: ~\$0.002  
+  – LLM calls: ~\$0.80  
+  – **Grand Total:** ~\$0.80  
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━  
+🔍 Why This Matters  
+
+1. **Semantic Integrity**  
+   – Context-aware embeddings bias toward valid parent categories.  
+   – LLM then picks the exact best fit—avoiding misclassification.  
+
+2. **Full Graph Connectivity**  
+   – No more dangling words—all links traverse cleanly.  
+   – New acquaintances adopt into the structure naturally.  
+
+3. **Bidirectional Consistency**  
+   – Parents point to their new children.  
+   – Definitions and UI reflect a fully wired web.  
+
+4. **Idempotency & Crash Safety**  
+   – Skip any orphan whose `parent != null`.  
+   – Clear stages logic ensures safe restarts with no duplicated work.  
+
+With this hybrid approach, your taxonomy remains coherent, intuitive, and fully connected—ready for the player’s logical and poetic journeys.  
+
+
+------------------------------------
+
+
+
+🗣️ PHASE 4: NATURAL-LANGUAGE DEFINITION PASS
+
+Goal: Turn each word’s structured metadata (parent, children, traits, acquaintances, purposes) into a clean, human-readable definition that feels organic and engaging to players. This adds personality and immersion while preserving all navigational affordances.
+
+1. Gather All Nodes  
+   🔍 Load `master_words.json` and `traits_master.json` into memory.  
+   • Includes all Thing Words and promoted Trait Words.  
+
+2. Prepare Prompt Template  
+   ✏️ Use a system + user prompt (see: `prompts/Natural Language.txt`) that:  
+     • Accepts a full metadata object for each word  
+     • Generates a sentence wikipedia-esque definition  
+     • References the word’s parent category  
+     • Weaves in up to X children, Y traits, and Z acquaintances (as the dev, you can decide how many of each to include)  
+     • Ends with: “Use no additional terms beyond what’s given.”  
+   ‣ This ensures coverage of every key relationship while minimizing hallucination or drift.
+
+3. Batch & Generate  
+   ⚡️ Process definitions in batches of 10–20 words per API call:  
+     • Send prompt + batch of JSON nodes to GPT-4 Turbo  
+     • Receive a list of `{ word, definition }` responses  
+     • Validate structure before saving  
+   ‣ Batching reduces per-call overhead and keeps costs predictable.
+
+4. Validate Output  
+   ✔️ For each generated definition:  
+     • Confirm the main word appears in its own definition  
+     • Optionally run a keyword coverage script to ensure presence of required metadata (parent, ≥1 trait, etc.)  
+     • Spot-check ~10% of definitions for quality  
+   ‣ Prevents silent errors or unusable definitions from slipping into the final UI.
+
+5. Persist Definitions  
+   💾 Write to `definitions_master.json` in this format:  
+     ```json
+     [
+       {
+         "word": "Cat",
+         "definition": "Cats are agile mammals known for their independence and graceful movements. They are often kept as pets and associated with traits like curiosity and nocturnality. Related ideas include dogs, litter boxes, and scratching posts."
+       },
+       …
+     ]
+     ```
+   ‣ Easy to look up and integrate on the front-end.
+
+6. Linkability Support  
+   🔗 All terms in the generated definitions that match a known Thing Word or Trait Word should be linkable in the UI.  
+   • Don’t encode links in the definition text itself  
+   • Instead, the front-end should match visible tokens against each word’s known metadata (parent, children, traits, acquaintances)  
+   • If matched, style and bind the word as a clickable hyperlink  
+   ‣ This allows for dynamic, robust linking even if the natural-language wording varies.
+
+7. Optional: Regeneration Support  
+   🔄 To incrementally re-render definitions later:  
+     • Track a `definitionLastUpdatedAt` timestamp per word  
+     • Only re-run the LLM if its metadata has changed since that time
+
+8. Output after Phase 4  
+   ✅ `definitions_master.json` with natural-language definitions for every Thing and Trait Word  
+   ✅ Front-end now supports immersive, readable traversal without breaking linkability
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━  
+🛠 TECH: Model, Cost & Format
+
+• Model: GPT-4 Turbo  
+  – Cost: $0.003 / 1K tokens  
+  – Easily fits ~20 metadata objects + prompt + output in 128K context  
+
+• Token & Cost Estimate  
+  – Avg: ~200 tokens per word (input + output)  
+  – 10,000 words = ~2M tokens → $6  
+  – 50,000 words → ~$30  
+  – 500,000 words → ~$300  
+
+• Batch Size  
+  – 10–20 words per request recommended  
+  – Keeps response latency low and throughput high
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━  
+📌 Why This Matters
+
+• 🚀 Player Experience: Adds clarity, narrative, and intuition to each node  
+• 🔁 Future-Proof: Easy to re-run when definitions change  
+• 🧠 Cognitive Glue: Makes the graph feel alive and explorable instead of abstract  
+• 🧩 Front-End Ready: UI link logic is metadata-driven, not tied to string parsing
+
+
+
+---------------
+
+========================
+TLDR: THE OVERALL STRATEGY
+========================                                                
+
+We grow a living word graph in four idempotent, crash-safe stages:
+	1.	Phase 1: Core Tree Growth
+Starting from a single root “Thing,” we breadth-first generate exactly seven children, seven traits, and seven acquaintances per node via GPT-4 Turbo. Children become new nodes; traits and acquaintances are logged for later. Each node tracks completion flags so you can pause, crash, or resume without losing progress. At the end, you have ~2 000 Thing-Words with a bulletproof parent→child backbone plus raw trait and acquaintance logs.
+	2.	Phase 2: Trait Normalization & Promotion
+We collapse redundant adjectives into canonical Trait-Words using fast, local embedding clustering (plus a simple WordNet / synonym pass) and only promote traits that appear on two or more Thing-Words. No further LLM calls are needed—your trait layer organically emerges from the data at almost zero cost.
+	3.	Phase 3: Acquaintance Adoption
+Every raw acquaintance is first seeded as a placeholder node, then slotted under a real parent via a hybrid approach: compute context-enhanced embeddings for each candidate, retrieve a top-20 shortlist per orphan, and finally ask GPT-4 Turbo to pick the single best parent. After that, you link each source word back to its newly adopted acquaintances. The result is a fully connected, intuitive network with zero dangling nodes.
+	4.	Phase 4: Natural-Language Definitions
+With metadata locked in, we batch out 2–3-sentence encyclopedia-style definitions for every Thing and Trait Word—via GPT-4 Turbo—by feeding each node’s full JSON (parent, children, traits, acquaintances, etc.) into a consistent prompt template. We validate output, persist to definitions_master.json, and let the front-end dynamically hyperlink any known keyword back into the graph. This final pass costs only a few dollars for thousands of words and gives players rich, linkable definitions that bring the entire semantic ecosystem to life.
+
+
+
+
+
+---------
+
+
+
+//needs work
+-----------------------------------------
+👩‍💻 DEVELOPER / DESIGNER USER EXPERIENCE
+-----------------------------------------
+
+Goal: to make it as easy as possible for me, the designer/developer, to:
+1. Be able to tweak parameters to see how differnet it makes the game feel, with the ability to save configurations as "files", name them, and load them back up. One such parameter I want to be able to shift is the number of children, traits, acquaintances, and purposes per node (Remove from the end of each collection of words]. Another such change would be the vertical granularity of the graph, so I can dial the complexity down or up, which would in turn remove 'gradations' in between the graph, so I can test the game with different levels of detail and complexity.
+2. Be able to easily run each phase of the build pipeline
+3. Be able to get clear, transparent logs progress indicators and other real-time progress indicators and feedback as I run the phases, so I'm not in the dark as to what is happening
+4. Be able to easily and intuitively test and see the output of a meaningful sample of each, so I can see the direction it's going in before committing to large LLM calls or expensive tasks.
+5. Be able to, if I choose to, view a verbose logging and audit trail just in case, so I can always ask "Why didn't X?" happen and have a method to diagnose the issues and look back
+6. have a resumable & idmpotent process, so I can pause, crash, or resume without losing progress, unless I explicitly ask to remove all progress.
+7. Be able to easily change the prompts being used by switching the text of the .txt files in the Prompts folder
+8. To see a default preset definition of each word using static text + variables, so I can see a rough approximation of what the game feels like even before doing the Natural Language Pass. (Ex. [word] is a type of 'parent' that is known for [traits]. Often, [word] may be connected in some way to [acquaintances]. Types of [word] may include[children], etc]
+Every phase is a self-contained script/app you can launch from the repo root.  
+9. To be able to work with dummy data and see how game looks with it
+10. To be able to contduct a "sandbox test" or dryrun to simulate each prase without writing to disk
+
+
+
+---------------------------------------------------------------------
+👩‍💻 IDEAS FOR HOW TO IMPLEMENT THE ABOVE (just ideas to be inspired by)
+----------------------------------------------------------------------
+
+1. CONFIGURATION MANAGEMENT  
+   • Store all adjustable parameters in a versioned `config` folder (e.g. `config/`), with JSON files you can name, save, and load.  
+     – e.g. `config/fast-test.json`, `config/full-run.json`  
+     – Override defaults by passing `--config myfile.json` to any script.  
+   • Exposed parameters include: childrenPerNode, traitsPerNode, acqsPerNode, purposesPerNode, graphDepth, batch sizes, dryRun, etc.  
+   • Dial “vertical granularity” by adjusting graphDepth or a minParentDepth threshold to collapse intermediate nodes.  
+
+2. ONE-COMMAND ENTRYPOINTS  
+   • Each phase is a standalone CLI script in `scripts/`—e.g.  
+     – `scripts/phase1.js` → npm run phase1  
+     – `scripts/phase2.js` → npm run phase2  
+     – `scripts/phase3.js` → npm run phase3  
+     – `scripts/phase4.js` → npm run phase4  
+   • Pass `--config` and other flags directly.  
+
+3. REAL-TIME PROGRESS & FEEDBACK  
+   • Terminal shows a live progress bar and summary line for each phase:  
+     – Phase1: [█████░░░░░]  45% (900/2000) – current="Vehicle"  
+     – Phase3: orphan="Shakespeare" shortlistReady(20/20)  
+   • Warnings on errors or rate limits trigger automatic retry with exponential back-off and log entry.  
+
+4. LIGHTWEIGHT SANDBOX & DRY-RUN  
+   • `--dryRun` mode simulates the entire pipeline on a miniature data sample (e.g. 10 root nodes) without writing to disk.  
+   • Use `config/test-sample.json` to surface one or two words, verify JSON outputs, inspect placeholder definitions, and stop before costly LLM calls.  
+   • Swap real data for dummy fixtures by passing `--dataSample dummy/` if you want full pipeline logic on synthetic inputs.  
+
+5. EASY SAMPLE INSPECTION  
+   • After any phase, run `npm run sample -- phaseX` to print a curated subset of outputs:  
+     – Phase1 sample: list 5 generated nodes + their children/traits/acqs  
+     – Phase3 sample: show 3 orphans with shortlists and chosen parents  
+   • This helps you preview outcomes before full-scale runs or LLM billing.  
+
+6. VERBOSE LOGGING & AUDIT TRAIL  
+   • By default, each run writes to `/logs/phaseX_YYYYMMDD.log` with timestamps, config snapshot, retry counts, token usage, and summary metrics.  
+   • Enable `--verbose` to include full request/response bodies for edge-case debugging.  
+
+7. RESUMABLE & IDEMPOTENT  
+   • All scripts respect per-node `stages` flags in JSON data stores.  
+   • Kill and restart any phase; it picks up where it left off.  
+   • Pass `--resetPhase X` to clear only that phase’s flags if you truly want to re-run from scratch.  
+
+8. PROMPT & MODEL SWAPPABILITY  
+   • All LLM and embedding calls read from `prompts/` and `utils/embeddings.js`.  
+   • Alter any `.txt` prompt file or swap model names in one config field—scripts automatically use the updated text on next run.  
+
+9. PRESET “ROUGH” DEFINITIONS  
+   • When Phase4 has not yet run, by default generate placeholder definitions from static templates:  
+     – “[Word] is a type of [parent] known for [trait1, trait2]. Commonly linked to [acq1, acq2]. Examples include [child1, child2]. etc etc.”  
+   • Controlled by `config/defaultDefs.json`; run with `npm run previewDefs` to see them in the UI.  
+
+10. INTERACTIVE DEBUGGING SHELL  
+    • `npm run phase1:inspect -- --node Banana` drops you into a REPL to:  
+      – Load record(`Banana`), view metadata, call `generateAcqs(record)`, etc.  
+    • Supports one-off LLM prompt tests, embedding PCA, clustering thresholds, etc.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
