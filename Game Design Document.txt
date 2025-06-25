@@ -564,9 +564,20 @@ Goal: Grow a cohesive parent→child taxonomy of main Thing Words (parents & chi
    📝 raw_traits.csv        ← empty (columns: word,trait)  
    📝 raw_acquaintances.csv ← empty (columns: word,acquaintance)  
 
+   **File Locations (per implementation structure):**
+   • `data/processed/master_words.json`
+   • `data/raw/raw_traits.csv`
+   • `data/raw/raw_acquaintances.csv`
+   • `data/raw/raw_purposes.csv`
+
 2. BFS Expansion Loop  
    ⏳ targetCount ← 2000  
    ➡️ queue ← ["Thing"]  
+
+   **Configuration-driven parameters:**
+   • `targetCount` from config file (e.g., 10 for test-sample.json, 2000 for full-run.json)
+   • `childrenPerNode`, `traitsPerNode`, `acquaintancesPerNode`, `rolesPerNode` from config
+   • `dryRun` mode for testing without API calls
 
    While (queue not empty) AND (master_words.json.length < targetCount):  
      a. Dequeue → currentWord  
@@ -1241,6 +1252,256 @@ LOGGING & MONITORING
 • Add optional safeguards only when real issues emerge in testing
 • Keep validation logic separate from core generation logic for maintainability
 • Use consistent logging format across all validation steps
+
+------------------------------------
+
+🔧 CONCRETE IMPLEMENTATION DETAILS
+
+Goal: Provide specific technical guidance for implementing the build pipeline with proper file organization, data formats, API configuration, error handling, batching, progress tracking, and development vs production modes.
+
+========================
+FILE/FOLDER STRUCTURE
+========================
+
+```
+6degrees/
+├── config/
+│   ├── default.json         # Base configuration
+│   ├── test-sample.json     # Small test config (10 nodes)
+│   ├── fast-test.json       # Medium test (100 nodes)
+│   └── full-run.json        # Production (2000+ nodes)
+├── data/
+│   ├── raw/                 # CSV files from Phase 1
+│   │   ├── raw_traits.csv
+│   │   ├── raw_acquaintances.csv
+│   │   └── raw_purposes.csv
+│   ├── processed/           # JSON files for each phase
+│   │   ├── master_words.json
+│   │   ├── traits_master.json
+│   │   └── roles_master.json
+│   └── definitions/         # Phase 4 outputs
+│       └── definitions_master.json
+├── prompts/
+│   ├── phase1/
+│   │   ├── children-generation.txt
+│   │   ├── trait-generation.txt
+│   │   ├── acquaintance-generation.txt
+│   │   └── role-generation.txt
+│   └── phase4/
+│       └── natural-language.txt
+├── scripts/
+│   ├── phase1.js
+│   ├── phase2.js
+│   ├── phase2-5.js
+│   ├── phase3.js
+│   └── phase4.js
+├── logs/
+│   └── phase1_20240625.log
+└── utils/
+    ├── embeddings.js
+    ├── validation.js
+    └── api-client.js
+```
+
+========================
+DATA FILE FORMATS
+========================
+
+**Mixed approach based on use case:**
+
+• **CSV for raw collections (Phase 1)**
+  - Simple, append-friendly for logging traits/acquaintances/roles
+  - Easy to process and validate
+  - Efficient for large datasets
+
+• **JSON for structured data**
+  - `master_words.json` with full node metadata and stage flags
+  - `traits_master.json` and `roles_master.json` for bridge nodes
+  - Preserves complex nested structures
+
+• **JSON for definitions**
+  - `definitions_master.json` for natural language definitions
+  - Easy front-end integration
+  - Maintains linkability metadata
+
+========================
+API CONFIGURATION
+========================
+
+**Environment Variables (.env file - gitignored):**
+```
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+ANTHROPIC_MODEL=gpt-4-turbo
+```
+
+**API Client Configuration (utils/api-client.js):**
+```javascript
+const config = {
+  model: process.env.ANTHROPIC_MODEL || 'gpt-4-turbo',
+  maxRetries: 2,  // As per GDD retry logic
+  backoffMs: 100   // 50-100ms as specified
+};
+```
+
+========================
+ERROR HANDLING STRATEGY
+========================
+
+**Fail-Safe Principle (as specified in GDD):**
+
+• **Warnings, not crashes**: Log and continue for non-critical errors
+• **Retry logic**: 2 attempts for format violations or exclusion violations
+• **Exponential backoff**: For HTTP 429 rate limits
+• **Manual review queue**: Log unresolvable issues for human intervention
+
+**Implementation Example:**
+```javascript
+async function callLLMWithRetry(prompt, validator, maxRetries = 2) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const result = await llm.generate(prompt);
+      if (validator(result)) return result;
+
+      // Add clarification to prompt for retry
+      prompt += '\nPlease ensure the response follows the exact format requested.';
+    } catch (e) {
+      if (e.status === 429) {
+        await sleep(Math.pow(2, i) * 1000); // Exponential backoff
+      }
+    }
+  }
+  // Log warning and return partial result
+  logger.warn(`Failed after ${maxRetries} attempts`);
+  return null;
+}
+```
+
+========================
+BATCHING LOGIC
+========================
+
+**Phase-specific batching (from GDD recommendations):**
+
+• **Phase 1**: No batching (BFS one word at a time)
+• **Phase 4**: 10-20 words per batch for definitions
+• **Configurable via config**: `batchSizes: { phase4: 15 }`
+
+**Configuration Example:**
+```json
+{
+  "batchSizes": {
+    "phase1": 1,
+    "phase4": 15
+  }
+}
+```
+
+========================
+PROGRESS TRACKING
+========================
+
+**Enhanced stage flags with metrics (as shown in GDD):**
+```json
+{
+  "stages": {
+    "childrenDone": false,
+    "rawLogged": false,
+    "traitsPromoted": false,
+    "rolesPromoted": false,
+    "acquaintancesAdopted": false,
+    "definitionGenerated": false
+  },
+  "metrics": {
+    "attemptCount": 0,
+    "lastModified": "2024-06-25T10:00:00Z",
+    "tokensUsed": 0
+  }
+}
+```
+
+**Real-time Progress Indicators:**
+• Terminal progress bars: `[█████░░░░░] 45% (900/2000) - current="Vehicle"`
+• Success/failure rates per phase
+• Token usage tracking
+• Time elapsed per phase
+
+========================
+DEVELOPMENT VS PRODUCTION
+========================
+
+**Configurable modes (as emphasized in GDD):**
+
+**Test Sample Configuration (config/test-sample.json):**
+```json
+{
+  "targetCount": 10,
+  "childrenPerNode": 3,
+  "traitsPerNode": 3,
+  "acquaintancesPerNode": 3,
+  "rolesPerNode": 1,
+  "dryRun": true,
+  "skipValidation": false
+}
+```
+
+**Full Production Configuration (config/full-run.json):**
+```json
+{
+  "targetCount": 2000,
+  "childrenPerNode": 7,
+  "traitsPerNode": 7,
+  "acquaintancesPerNode": 7,
+  "rolesPerNode": 3,
+  "dryRun": false,
+  "skipValidation": false
+}
+```
+
+**Development Features:**
+• **Dry-run mode**: Simulate pipeline without API calls
+• **Sample inspection**: `npm run sample -- phaseX` for curated output preview
+• **Interactive debugging**: `npm run phase1:inspect -- --node Banana`
+• **Verbose logging**: Full request/response bodies for debugging
+
+========================
+SCRIPT ENTRY POINTS
+========================
+
+**One-command entry points (as specified in GDD):**
+```bash
+npm run phase1 -- --config test-sample.json
+npm run phase2 -- --config full-run.json
+npm run phase2-5 -- --config full-run.json
+npm run phase3 -- --config full-run.json
+npm run phase4 -- --config full-run.json
+```
+
+**Utility Commands:**
+```bash
+npm run sample -- phase1          # Preview outputs
+npm run reset -- phase1           # Clear stage flags
+npm run validate -- phase3        # Run validation only
+npm run dry-run -- phase1         # Simulate without API calls
+```
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━  
+🧠 Why These Implementation Details Matter
+
+• **Developer Experience**: Easy configuration switching and progress monitoring
+• **Reliability**: Robust error handling and resumability
+• **Cost Management**: Token tracking and dry-run capabilities
+• **Maintainability**: Clear file organization and separation of concerns
+• **Scalability**: Configurable parameters for different deployment scenarios
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━  
+📎 Implementation Guidelines
+
+• Start with test-sample.json for initial development and validation
+• Use dry-run mode to verify pipeline logic before API costs
+• Monitor token usage and success rates during development
+• Keep configuration files version-controlled but API keys in .env
+• Implement all validation steps before moving to production runs
 
 
 
