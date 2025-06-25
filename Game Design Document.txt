@@ -361,8 +361,11 @@ WHEN ROLES ARE GENERATED
 ========================
 - **LLM-Based Decision**: For each Thing Word, an LLM determines whether roles are semantically appropriate on a case-by-case basis.
 - **Semantic Salience**: Roles are only generated when the function or purpose of a Thing Word is a central part of its identity.
+- **Decision Criteria**: The LLM asks: "Does this word represent an entity whose primary identity is defined by a function, service, or purpose in the world?"
+- **Key Signals**: concrete tools, professions, social roles, systems with active effects.
 - **Examples of Role-Worthy Words**: "Scissors" (cutting), "Guru" (guiding), "Dog" (companionship), "Therapist" (healing)
 - **Examples of Non-Role-Worthy Words**: "Cloud" (abstract concept), "Beauty" (aesthetic quality), "Feather" (natural object without clear function)
+- **Conditional Generation**: Roles are the only metadata type generated conditionally. Children, traits, and acquaintances are always generated for every Thing Word.
 - **Rationale**: This approach avoids forcing roles onto concepts where purpose would feel artificial, keeping the graph clean and meaningful.
 
 ========================
@@ -384,7 +387,9 @@ ROLE FORMAT & STRUCTURE
   • Must clearly reflect functional or purposeful use
   • Must be able to stand alone as a concept
 - **Number of Roles**: Maximum of 3 roles per Thing Word, but often fewer. Quality over quantity.
-- **Ordering**: Roles are always ordered by salience (most cognitively common first) to enable safe, deterministic pruning.
+- **Selection Criteria**: The LLM is instructed to "List the three most salient roles — the ones most people intuitively think of first when they consider [WORD]. Order them by likelihood."
+- **Salience-Based Ordering**: Roles are always ordered by cognitive salience (most likely to be thought of first) to enable safe, deterministic pruning.
+- **Rationale**: This phrasing biases the model toward its strongest candidates, and because we truncate at 3 and then later canonicalize/promote only roles appearing in ≥2 words, the graph naturally favors the most cognitive "wins."
 
 ========================
 DEFINITION SYSTEM
@@ -474,9 +479,11 @@ Roles in Six Degrees describe the functional or intentional use of a Thing — w
 
 1. Selective Role Generation During Growth  
     • In Phase 1, every Thing Word is evaluated by an LLM to determine whether it warrants roles at all.
+    • **Conditional Generation**: Roles are the only metadata type generated conditionally. Children, traits, and acquaintances are always generated for every Thing Word.
     • Only if a functional use is central to its meaning does the system generate 1-3 candidate Role labels.
     • These role strings are stored in the Thing's metadata under a `purposes` array, alongside traits and acquaintances.
     • Many Thing Words — like "Cloud" or "Beauty" — may have no roles at all, and that's fine.
+    • **Decision Logging**: The LLM's internal rationale for returning NONE is not captured or persisted to avoid parsing complexity.
 
 2. Canonicalization & Filtering (Phase 2.5)
     • After tree growth, all raw purpose strings are normalized:
@@ -527,7 +534,7 @@ Roles in Six Degrees describe the functional or intentional use of a Thing — w
 
 
 
-/// STILL NEEDS TO INCLUDE ROLES                                                
+                                            
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ▗▄▄▖ ▗▖ ▗▖▗▄▄▄▖▗▖   ▗▄▄▄     ▗▄▄▄▖▗▖    ▗▄▖ ▗▖ ▗▖    ▗▄▄▄▖▗▄▄▄ ▗▄▄▄▖ ▗▄▖ 
 ▐▌ ▐▌▐▌ ▐▌  █  ▐▌   ▐▌  █    ▐▌   ▐▌   ▐▌ ▐▌▐▌ ▐▌      █  ▐▌  █▐▌   ▐▌ ▐▌
@@ -606,6 +613,9 @@ Goal: Grow a cohesive parent→child taxonomy of main Thing Words (parents & chi
            "Determine if [currentWord] has a clear functional purpose or role. If yes, list 1-3 role words (gerund or abstract nouns) that describe what [currentWord] does or is for. If no clear purpose, return NONE.  
             Return comma-separated nouns or NONE only."  (actual prompt in prompts/role generation.txt)
            ↪️ Retry if format invalid.
+
+           **Enhanced Prompt Guidance:**
+           "Does [currentWord] represent an entity whose primary identity is defined by a function, service, or purpose in the world? Key signals: concrete tools, professions, social roles, systems with active effects. If yes, list the three most salient roles — the ones most people intuitively think of first when they consider [currentWord]. Order them by likelihood. If no clear purpose, return NONE."
 
      d.1. **Exclusion-List Validation** (After each LLM call)
         • For acquaintances generation, verify no excluded terms appear in the response
@@ -1507,8 +1517,12 @@ npm run dry-run -- phase1         # Simulate without API calls
 
 
 
-
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+▗▄▄▄▖▗▄▄▖  ▗▄▖ ▗▖  ▗▖▗▄▄▄▖    ▗▄▄▄▖▗▖  ▗▖▗▄▄▄ 
+▐▌   ▐▌ ▐▌▐▌ ▐▌▐▛▚▖▐▌  █      ▐▌   ▐▛▚▖▐▌▐▌  █
+▐▛▀▀▘▐▛▀▚▖▐▌ ▐▌▐▌ ▝▜▌  █      ▐▛▀▀▘▐▌ ▝▜▌▐▌  █
+▐▌   ▐▌ ▐▌▝▚▄▞▘▐▌  ▐▌  █      ▐▙▄▄▖▐▌  ▐▌▐▙▄▄▀
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                                  
 
 
 
