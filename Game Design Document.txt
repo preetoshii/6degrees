@@ -1080,7 +1080,96 @@ With this hybrid approach, your taxonomy remains coherent, intuitive, and fully 
 
 ------------------------------------
 
+🔗 PHASE 3.5: BUILD UNIFIED INDEX
 
+Goal: Create a unified index of all words (Thing, Trait, Role) for frontend navigation and deduplication validation.
+
+1. Load All Word Collections  
+   📝 Read `master_words.json`, `traits_master.json`, and `roles_master.json` into memory.  
+   • Collect all word entries from each file with their types and metadata.  
+
+2. Build Unified Index  
+   🔄 Create `unified_master.json` with structure:  
+     ```json
+     {
+       "all_words": {
+         "Cat": { 
+           "type": "thing", 
+           "file": "master_words.json",
+           "metadata": { /* full thing word data */ }
+         },
+         "Agile": { 
+           "type": "trait", 
+           "file": "traits_master.json",
+           "metadata": { /* full trait word data */ }
+         },
+         "Cutting": { 
+           "type": "role", 
+           "file": "roles_master.json",
+           "metadata": { /* full role word data */ }
+         }
+       },
+       "stats": {
+         "total_words": 2500,
+         "thing_words": 2000,
+         "trait_words": 300,
+         "role_words": 200
+       }
+     }
+     ```  
+
+3. Deduplication Validation  
+   • Check for any word that appears in multiple files with different types.  
+   • Log any duplicates for manual review (e.g., "Cutting" as both Thing and Role).  
+   • This ensures data integrity and prevents frontend confusion.  
+
+4. Frontend Optimization  
+   • Create a lightweight index file for fast lookups:  
+     ```json
+     {
+       "Cat": "thing",
+       "Agile": "trait", 
+       "Cutting": "role"
+     }
+     ```  
+   • This enables O(1) word existence checks without loading full metadata.  
+
+5. Output after Phase 3.5  
+   ✅ `unified_master.json` — complete index of all words with full metadata  
+   ✅ `word_index.json` — lightweight lookup table for frontend performance  
+   ✅ Deduplication report — any cross-type duplicates logged for review  
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━  
+🛠 TECH: Approach, Why & Cost  
+
+• **No LLM Calls Required** — purely data processing operation  
+• **Local Processing** — reads existing JSON files and creates new indexes  
+• **Cost**: ~$0.00 (no API calls)  
+• **Performance**: Fast file I/O operations only  
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━  
+🔍 Why This Matters  
+
+1. **Frontend Performance**  
+   – Single file lookup instead of searching across 3 separate files  
+   – O(1) word existence checks for clickable links  
+
+2. **Data Integrity**  
+   – Prevents accidental duplicates across word types  
+   – Ensures each word has a single, unambiguous identity  
+
+3. **Developer Experience**  
+   – Simplified frontend integration  
+   – Clear separation between build process and runtime data  
+
+4. **Game Navigation**  
+   – Players can click any word regardless of its type  
+   – Unified traversal experience across all word categories  
+
+This phase bridges the gap between the modular build process and the unified frontend experience, ensuring optimal performance and data consistency.
+
+
+------------------------------------
 
 🗣️ PHASE 4: NATURAL-LANGUAGE DEFINITION PASS (WE WONT DO THIS RIGHT NOW. WE WILL JUST HAVE THE WORDS / LINKS WITHOUT A NATURAL LANGUAGE PASS FOR PLAYTESTING)
 
@@ -1289,6 +1378,9 @@ FILE/FOLDER STRUCTURE
 │   │   ├── master_words.json
 │   │   ├── traits_master.json
 │   │   └── roles_master.json
+│   ├── unified/             # Phase 3.5 outputs
+│   │   ├── unified_master.json
+│   │   └── word_index.json
 │   └── definitions/         # Phase 4 outputs
 │       └── definitions_master.json
 ├── prompts/
@@ -1304,6 +1396,7 @@ FILE/FOLDER STRUCTURE
 │   ├── phase2.js
 │   ├── phase2-5.js
 │   ├── phase3.js
+│   ├── phase3-5.js
 │   └── phase4.js
 ├── logs/
 │   └── phase1_20240625.log
@@ -1328,6 +1421,11 @@ DATA FILE FORMATS
   - `master_words.json` with full node metadata and stage flags
   - `traits_master.json` and `roles_master.json` for bridge nodes
   - Preserves complex nested structures
+
+• **JSON for unified access**
+  - `unified_master.json` for complete index of all words regardless of type
+  - `word_index.json` for lightweight O(1) lookups
+  - Enables frontend to quickly verify any word exists and is clickable
 
 • **JSON for definitions**
   - `definitions_master.json` for natural language definitions
@@ -1484,6 +1582,7 @@ npm run phase1 -- --config test-sample.json
 npm run phase2 -- --config full-run.json
 npm run phase2-5 -- --config full-run.json
 npm run phase3 -- --config full-run.json
+npm run phase3-5 -- --config full-run.json
 npm run phase4 -- --config full-run.json
 ```
 
@@ -1529,18 +1628,18 @@ FRONT END
 
 1. Launch & Intro Screen
 	•	Splash / Title
-	•	Display a clean “6 Degrees” logo or title.
-	•	Centered “Play Now” button invites the player to begin.
+	•	Display a clean "6 Degrees" logo or title.
+	•	Centered "Play Now" button invites the player to begin.
 	•	Settings / Difficulty (optional)
 	•	If you support multiple step-counts (e.g. 4-, 6-, 8-degree puzzles), allow the player to choose here.
-	•	Store this value as the game’s “X” (number of clicks from origin → destination).
+	•	Store this value as the game's "X" (number of clicks from origin → destination).
 
 2. Game Start
 	•	Generate Puzzle
 	•	Pick a random destination word from the graph.
 	•	Walk exactly X hops away (parent/child/acquaintance/trait/role links) to select an origin word that is guaranteed to reach the destination in ≤ X clicks.
 	•	Show Origin Definition
-	•	Navigate immediately to the origin word’s “definition page.”
+	•	Navigate immediately to the origin word's "definition page."
 
 3. Definition Page Layout
 
@@ -1557,12 +1656,12 @@ Each word (Thing, Trait or Role) has its own page template:
 │ ACQUAINTANCES: Mouse • Litter Box • …   │ ← poetic links
 │ PURPOSES: Companion • Pet              │ ← roles/purposes
 ├─────────────────────────────────────────┤
-│ [Footer or Sidebar: “Quit” | “Help”]   │
+│ [Footer or Sidebar: "Quit" | "Help"]   │
 └─────────────────────────────────────────┘
 
 	•	Header / Sidebar
 	•	Destination Reminder: Always show the goal word.
-	•	Step Counter: “Steps: N” increments on each forward click.
+	•	Step Counter: "Steps: N" increments on each forward click.
 	•	Breadcrumb Trail:
 	•	Shows each visited word in order.
 	•	Clicking any breadcrumb rewinds the game back to that point (resets step count and path accordingly).
@@ -1580,7 +1679,7 @@ Each word (Thing, Trait or Role) has its own page template:
 
 4. Traversal & Rules
 	•	Click Behavior
-	•	Clicking any metadata link (parent, child, trait, acquaintance, role) opens that word’s definition page.
+	•	Clicking any metadata link (parent, child, trait, acquaintance, role) opens that word's definition page.
 	•	Each forward click increments the step count by 1.
 	•	No penalty for backtracking—clicking a breadcrumb simply restores the previous state.
 	•	No Hard Blocks
@@ -1590,7 +1689,7 @@ Each word (Thing, Trait or Role) has its own page template:
 
 5. Winning the Game
 	•	Arrival
-	•	When the player clicks the destination word, the game immediately transitions to a “Victory” screen.
+	•	When the player clicks the destination word, the game immediately transitions to a "Victory" screen.
 	•	Victory Screen
 
   ┌───────────────────────────────────┐
