@@ -250,6 +250,15 @@ ACQUAINTANCE
 - Acquaintances are a key part of the "Poet's Traversal Strategy," as they allow players to warp across conceptual space — following emotional resonance, metaphorical logic, or cultural symbolism rather than strict hierarchy. They enable surprising yet satisfying leaps between ideas that may not be categorically related, but feel meaningfully connected.
 - They should be the MOST LIKELY thought of word that fits this crtieria, and put in order of most likely thought about (Not unlike the game of Jeopardy)
 
+========================
+ACQUAINTANCE SYMMETRY
+========================
+- **One-Directional by Default**: Acquaintances are generated based on salience from one side only. If "Romeo" lists "Juliet" as an acquaintance, this does not automatically mean "Juliet" lists "Romeo."
+- **Salience-Based Generation**: Each word's acquaintances reflect what people think of when they hear that specific word. "Romeo" → "Juliet" because people think of Juliet when hearing Romeo, but "Juliet" might evoke "Tragedy" or "Balcony" more prominently than "Romeo."
+- **Natural Bidirectional Emergence**: If both directions independently emerge during generation (e.g., both "Romeo" and "Juliet" list each other), this represents a strong, naturally symmetric association.
+- **Deduplication Strategy**: During Phase 3, the system checks for existing bidirectional pairs and prevents redundant metadata while preserving the natural strength of mutual associations.
+- **Rationale**: Enforcing artificial symmetry would dilute signal quality and inflate noise in the graph. Letting associations emerge naturally preserves the authentic, salience-based nature of human associative thinking.
+
 Examples:
 - "9/11" → Acquaintances: Osama Bin Laden, Twin Towers, Airplane, Collapse, War on Terror, Pentagon, NYC  
 - "Romeo" → Acquaintances: Juliet, Balcony, Poison, Tragedy, Youth, Mask, Dagger  
@@ -443,6 +452,7 @@ As with Traits, Role definitions grow richer as the graph expands. Role Words he
 • Roles are especially important for tools, social beings, professions, and systems with an active function.
 • But by requiring functional salience (i.e. only assigning Roles when they're central), the game avoids artificial or bloated metadata.
 • Roles give players a new strategic traversal dimension: function.
+• **Bidirectional consistency** ensures that clicking on a Role shows all Things that perform that function, and clicking on a Thing shows its Roles with confidence that the Role node truly connects back.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 📎 Notes
@@ -476,7 +486,7 @@ Roles in Six Degrees describe the functional or intentional use of a Thing — w
 
 3. Role Word Structure  
     • Like Traits, Role Words are stand-alone bridge nodes. They have:
-        • `exemplars`: all Thing Words that listed the Role in their metadata  
+        • `exemplars`: all Thing Words that listed the Role in their metadata (populated during promotion)
         • `acquaintances`: 5-7 symbolic or functional associates of the Role (generated during promotion)
     • They do not have children or parents, and are not part of the parent-child hierarchy.
 
@@ -502,6 +512,7 @@ Roles in Six Degrees describe the functional or intentional use of a Thing — w
 • Roles are especially important for tools, social beings, professions, and systems with an active function.
 • But by requiring functional salience (i.e. only assigning Roles when they're central), the game avoids artificial or bloated metadata.
 • Roles give players a new strategic traversal dimension: function.
+• **Bidirectional consistency** ensures that clicking on a Role shows all Things that perform that function, and clicking on a Thing shows its Roles with confidence that the Role node truly connects back.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 📎 Notes
@@ -657,6 +668,7 @@ Goal: Grow a cohesive parent→child taxonomy of main Thing Words (parents & chi
 as a clickable link in the definition.
 	•	These are guaranteed to exist in the metadata regardless of whether the node has received a Phase 4 natural-language definition or is still showing raw JSON metadata.
 	•	This eliminates the need to insert markup or hyperlinks into the raw text returned by the model.
+	•	**Acquaintance Directionality**: Acquaintances are one-directional by default (A→B doesn't imply B→A). Natural bidirectional associations emerge independently and are deduplicated during Phase 3.
 
 
 
@@ -697,18 +709,18 @@ Goal: Collapse redundant raw adjectives into canonical Trait Words, then promote
 
 6. Count & Promote Traits  
    ➡️ Group normalized pairs by `canonical`, count **distinct** words:  
-     • If count ≥ 2 **and** for all exhibitor nodes `stages.traitsPromoted == false`:  
+     • If count ≥ 2 **and** for all exemplar nodes `stages.traitsPromoted == false`:  
        a. Add a Trait node in `traits_master.json`:  
           ```json
           {
             "word":          "<canonicalTrait>",
             "type":          "trait",
-            "exhibitors":    [/* sorted list of Thing Words */],
+            "exemplars":     [/* sorted list of Thing Words */],
             "related_traits": []
           }
           ```  
-       b. For each exhibitor in `master_words.json`, push `<canonicalTrait>` into its `traits` array.  
-       c. Set each exhibitor's `stages.traitsPromoted = true`.  
+       b. For each exemplar in `master_words.json`, push `<canonicalTrait>` into its `traits` array.  
+       c. Set each exemplar's `stages.traitsPromoted = true`.  
 
 7. Persist & Resume Safety  
    • After each cluster promotion, write out updated `traits_master.json` and `master_words.json`.  
@@ -743,7 +755,7 @@ Goal: Collapse redundant raw adjectives into canonical Trait Words, then promote
 🔍 **Key Essentials**  
 1. **Idempotency via `traitsPromoted` flags**  
 2. **Embedding-based clustering** (threshold ~0.8)  
-3. **Promote only traits ≥ 2 exhibitors**  
+3. **Promote only traits ≥ 2 exemplars**  
 4. **Persistent writes after each promotion**  
 5. **Resumable on crash/restart**  
 
@@ -784,7 +796,7 @@ Goal: Convert raw role strings into canonical Role Words, promote only those sha
 
 6. Count & Promote Roles  
    ➡️ Group normalized pairs by `canonical`, count **distinct** words:  
-     • If count ≥ 2 **and** for all exhibitor nodes `stages.rolesPromoted == false`:  
+     • If count ≥ 2 **and** for all exemplar nodes `stages.rolesPromoted == false`:  
        a. Add a Role node in `roles_master.json`:  
           ```json
           {
@@ -794,8 +806,9 @@ Goal: Convert raw role strings into canonical Role Words, promote only those sha
             "acquaintances": []
           }
           ```  
-       b. For each exhibitor in `master_words.json`, push `<canonicalRole>` into its `purposes` array.  
-       c. Set each exhibitor's `stages.rolesPromoted = true`.  
+       b. Populate the Role node's exemplars array with all Thing Words that listed this role (from the normalized list).
+       c. For each exemplar in `master_words.json`, push `<canonicalRole>` into its `purposes` array.  
+       d. Set each exemplar's `stages.rolesPromoted = true`.
 
 7. Generate Role Acquaintances  
    🔄 For each promoted Role Word:  
@@ -837,7 +850,7 @@ Goal: Convert raw role strings into canonical Role Words, promote only those sha
 🔍 **Key Essentials**  
 1. **Idempotency via `rolesPromoted` flags**  
 2. **Embedding-based clustering** (threshold ~0.8)  
-3. **Promote only roles ≥ 2 exhibitors**  
+3. **Promote only roles ≥ 2 exemplars**  
 4. **Generate acquaintances during promotion**  
 5. **Persistent writes after each promotion**  
 6. **Resumable on crash/restart**  
@@ -900,6 +913,16 @@ Goal: Ensure every "Acquaintance" word hangs from the main taxonomy rather than 
      • Assign `chosenParent = response`.  
    ‣ Rationale: LLM picks the most precise fit from a semantically-filtered set—minimizing hallucination.  
 
+6.a. Parent-Child Validation  
+   • After LLM selects a parent, run a secondary validation check:
+     ```
+     "Is [orphan] a kind of [parent]? Answer yes or no only."
+     ```
+   • If validation fails (answer = "no"), log the case for review and consider retry with different shortlist.
+   • This lightweight check catches edge-case misclassifications due to polysemy or fuzzy category boundaries.
+   • Example failure cases: "Mercury" (planet vs. metal vs. deity), "Democracy" under "Food".
+   ‣ Rationale: Prevents semantic violations that could disrupt traversal and confuse players.
+
 7. Persist Parent Assignments (Bidirectional)  
    • Update each orphan node's `parent = chosenParent` in `master_words.json`.  
    • Then locate the `chosenParent` node and push `acq` into its `children` array (if not already present).  
@@ -912,6 +935,12 @@ Goal: Ensure every "Acquaintance" word hangs from the main taxonomy rather than 
    • Persist `master_words.json`.  
    ‣ Rationale: Now every Thing Word correctly references its lateral connections.  
 
+8.a. De-dupe & Merge Existing Edges  
+   • Before creating an A→B acquaintance link, check whether B's acquaintances already contains A (and/or A's acquaintances contains B).  
+   • If so, skip creating a new edge—treat it as a naturally symmetric association that has already emerged.  
+   • This prevents redundant metadata (e.g. both "Romeo→Juliet" and "Juliet→Romeo" only materializing once), while still allowing true bidirectional pairs that both sides generated independently.  
+   ‣ Rationale: Preserves the natural strength of mutual associations without artificial inflation.
+
 9. (Optional) Prune Duplicate Acquaintances  
    • Cluster near-identical nodes (e.g. "Color" vs. "Colour"), merge them, rewrite links.  
    ‣ Rationale: Keeps graph clean—skip unless obvious duplicates appear.  
@@ -921,6 +950,8 @@ Goal: Ensure every "Acquaintance" word hangs from the main taxonomy rather than 
      – Every orphan "Thing Word" has a valid `parent`.  
      – Every original Thing Word's `acquaintances` array is filled.  
      – Every adopted child is correctly listed in its parent's `children` array.  
+     – Natural bidirectional associations are preserved without redundancy.
+     – All parent-child relationships have been validated for semantic correctness.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━  
 🛠 TECH: Hybrid Approach, Why & Cost  
@@ -939,10 +970,16 @@ Goal: Ensure every "Acquaintance" word hangs from the main taxonomy rather than 
   – Prompt size: ~100 tokens/orphan → 2 000 orphans → 200 000 tokens.  
   – Cost: 200 000 tokens × \$0.004/token ≈ **\$0.80**.  
 
+• **LLM Validation**  
+  – Model: GPT-4 Turbo  
+  – Purpose: Verify parent-child semantic correctness.  
+  – Cost: ~20 tokens/orphan × 2 000 orphans ≈ 40 000 tokens → **\$0.16**.  
+
 • **Total Phase 3 Estimate**  
   – Embeddings: ~\$0.002  
   – LLM calls: ~\$0.80  
-  – **Grand Total:** ~\$0.80  
+  – Validation: ~\$0.16  
+  – **Grand Total:** ~\$0.96
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━  
 🔍 Why This Matters  
@@ -950,6 +987,7 @@ Goal: Ensure every "Acquaintance" word hangs from the main taxonomy rather than 
 1. **Semantic Integrity**  
    – Context-aware embeddings bias toward valid parent categories.  
    – LLM then picks the exact best fit—avoiding misclassification.  
+   – Validation step catches edge-case misclassifications due to polysemy or fuzzy boundaries.
 
 2. **Full Graph Connectivity**  
    – No more dangling words—all links traverse cleanly.  
@@ -962,6 +1000,10 @@ Goal: Ensure every "Acquaintance" word hangs from the main taxonomy rather than 
 4. **Idempotency & Crash Safety**  
    – Skip any orphan whose `parent != null`.  
    – Clear stages logic ensures safe restarts with no duplicated work.  
+
+5. **Quality Assurance**  
+   – Lightweight validation prevents semantic violations that could disrupt traversal.
+   – Catches edge cases like "Mercury" (planet vs. metal vs. deity) or "Democracy" under "Food".
 
 With this hybrid approach, your taxonomy remains coherent, intuitive, and fully connected—ready for the player's logical and poetic journeys.  
 
@@ -1067,7 +1109,7 @@ We grow a living word graph in four idempotent, crash-safe stages:
 	1.	Phase 1: Core Tree Growth
 Starting from a single root "Thing," we breadth-first generate exactly seven children, seven traits, and seven acquaintances per node via GPT-4 Turbo. For roles, we use an LLM to determine whether each Thing Word warrants roles at all, and if so, generate 1-3 salient role labels. Children become new nodes; traits, acquaintances, and roles are logged for later. Each node tracks completion flags so you can pause, crash, or resume without losing progress. At the end, you have ~2 000 Thing-Words with a bulletproof parent→child backbone plus raw trait, acquaintance, and role logs.
 	2.	Phase 2: Trait Normalization & Promotion
-We collapse redundant adjectives into canonical Trait-Words using fast, local embedding clustering (plus a simple WordNet / synonym pass) and only promote traits that appear on two or more Thing-Words. No further LLM calls are needed—your trait layer organically emerges from the data at almost zero cost.
+We collapse redundant adjectives into canonical Trait Words using fast, local embedding clustering (plus a simple WordNet / synonym pass) and only promote traits that appear on two or more Thing-Words. No further LLM calls are needed—your trait layer organically emerges from the data at almost zero cost.
 	3.	Phase 2.5: Role Normalization & Promotion
 We collapse redundant role strings into canonical Role-Words using the same embedding clustering approach as traits. Only roles shared by ≥2 Thing Words are promoted. For each promoted Role Word, we generate 5-7 acquaintances using GPT-4 Turbo to ground the role semantically and enable lateral traversal.
 	4.	Phase 3: Acquaintance Adoption
@@ -1142,6 +1184,7 @@ Every phase is a self-contained script/app you can launch from the repo root.
 6. VERBOSE LOGGING & AUDIT TRAIL  
    • By default, each run writes to `/logs/phaseX_YYYYMMDD.log` with timestamps, config snapshot, retry counts, token usage, and summary metrics.  
    • Enable `--verbose` to include full request/response bodies for edge-case debugging.  
+   • Phase 3 validation failures are logged for review and potential retry.
 
 7. RESUMABLE & IDEMPOTENT  
    • All scripts respect per-node `stages` flags in JSON data stores.  
@@ -1161,6 +1204,11 @@ Every phase is a self-contained script/app you can launch from the repo root.
     • `npm run phase1:inspect -- --node Banana` drops you into a REPL to:  
       – Load record(`Banana`), view metadata, call `generateAcqs(record)`, etc.  
     • Supports one-off LLM prompt tests, embedding PCA, clustering thresholds, etc.  
+
+11. QUALITY ASSURANCE FEATURES  
+    • Phase 3 includes parent-child validation to catch semantic misclassifications.
+    • Validation can be disabled during prototyping with `--skipValidation` flag.
+    • Failed validations are logged for review and potential manual intervention.
 
 
 
