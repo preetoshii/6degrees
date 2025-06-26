@@ -1,6 +1,104 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import gameData from '../../data/dummy_data.json'
+import rawGameData from '../../data/dummy_data.json'
+
+// Data Adapter Layer - Makes frontend robust against backend changes
+class GameDataAdapter {
+  constructor(rawData) {
+    this.raw = rawData || {}
+    this.words = this.normalizeWords()
+    this.buildInfo = this.normalizeBuildInfo()
+    this.stats = this.normalizeStats()
+  }
+
+  normalizeWords() {
+    const words = {}
+    
+    // Add master words (thing words)
+    if (this.raw.master_words) {
+      Object.entries(this.raw.master_words).forEach(([key, word]) => {
+        words[key] = this.normalizeWord(word)
+      })
+    }
+    
+    // Add trait words
+    if (this.raw.traits_master) {
+      Object.entries(this.raw.traits_master).forEach(([key, trait]) => {
+        words[key] = this.normalizeWord(trait)
+      })
+    }
+    
+    // Add role words
+    if (this.raw.roles_master) {
+      Object.entries(this.raw.roles_master).forEach(([key, role]) => {
+        words[key] = this.normalizeWord(role)
+      })
+    }
+    
+    return words
+  }
+
+  normalizeWord(word) {
+    return {
+      word: word.word || 'Unknown',
+      type: word.type || 'thing',
+      parent: word.parent || null,
+      children: word.children || [],
+      traits: word.traits || [],
+      acquaintances: word.acquaintances || [],
+      purposes: word.purposes || [],
+      exemplars: word.exemplars || [],
+      related_traits: word.related_traits || [],
+      definition: word.definition || null
+    }
+  }
+
+  normalizeBuildInfo() {
+    return {
+      timestamp: this.raw.buildInfo?.timestamp || null,
+      date: this.raw.buildInfo?.date || 'Unknown'
+    }
+  }
+
+  normalizeStats() {
+    return {
+      total_words: this.raw.stats?.total_words || Object.keys(this.words).length,
+      thing_words: this.raw.stats?.thing_words || 0,
+      trait_words: this.raw.stats?.trait_words || 0,
+      role_words: this.raw.stats?.role_words || 0
+    }
+  }
+
+  // Safe word lookup
+  findWord(wordName) {
+    return this.words[wordName] || null
+  }
+
+  // Get all word names
+  getWordNames() {
+    return Object.keys(this.words)
+  }
+
+  // Check if word exists
+  hasWord(wordName) {
+    return wordName in this.words
+  }
+
+  // Get words by type
+  getWordsByType(type) {
+    return Object.values(this.words).filter(word => word.type === type)
+  }
+
+  // Safe game config access
+  getGameConfig() {
+    return {
+      daily_puzzle: this.raw.game_config?.daily_puzzle || null
+    }
+  }
+}
+
+// Initialize the adapter
+const gameData = new GameDataAdapter(rawGameData)
 
 function App() {
   const [currentWord, setCurrentWord] = useState(null)
@@ -10,6 +108,7 @@ function App() {
   const [destination, setDestination] = useState(null)
   const [viewMode, setViewMode] = useState('natural') // 'natural' or 'structured'
   const [showOptimalPath, setShowOptimalPath] = useState(false)
+  const [showGraphExplorer, setShowGraphExplorer] = useState(false)
 
   // Initialize game on mount
   useEffect(() => {
@@ -57,7 +156,27 @@ function App() {
   }, [path])
 
   const startNewGame = () => {
-    const { origin, destination } = gameData.game_config.daily_puzzle
+    // Use daily puzzle if available, otherwise pick random start/end
+    let origin = 'Thing'
+    let destination = 'Horse'
+    
+    const config = gameData.getGameConfig()
+    if (config.daily_puzzle) {
+      origin = config.daily_puzzle.origin
+      destination = config.daily_puzzle.destination
+    } else {
+      // Pick a random origin and destination from available words
+      const wordNames = gameData.getWordNames()
+      if (wordNames.length > 1) {
+        origin = wordNames[0] // Start with first word (likely "Thing")
+        // Pick a random destination that's not the origin
+        const possibleDests = wordNames.filter(w => w !== origin)
+        if (possibleDests.length > 0) {
+          destination = possibleDests[Math.floor(Math.random() * possibleDests.length)]
+        }
+      }
+    }
+    
     setCurrentWord(origin)
     setDestination(destination)
     setPath([origin])
@@ -101,19 +220,7 @@ function App() {
   }
 
   const findWordData = (wordName) => {
-    // Check master words first
-    if (gameData.master_words[wordName]) {
-      return gameData.master_words[wordName]
-    }
-    // Then check traits
-    if (gameData.traits[wordName]) {
-      return gameData.traits[wordName]
-    }
-    // Finally check roles
-    if (gameData.roles[wordName]) {
-      return gameData.roles[wordName]
-    }
-    return null
+    return gameData.findWord(wordName)
   }
 
   const shareScore = () => {
@@ -166,7 +273,7 @@ function App() {
   if (gameWon) {
     return (
       <div className="app">
-        <Header destination={destination} stepCount={stepCount} viewMode={viewMode} setViewMode={setViewMode} />
+        <Header destination={destination} stepCount={stepCount} viewMode={viewMode} setViewMode={setViewMode} onOpenGraphExplorer={() => setShowGraphExplorer(true)} />
         <main className="main-content">
           <div className="victory-screen">
             <h2>🎉 Victory!</h2>
@@ -195,7 +302,7 @@ function App() {
 
   return (
     <div className="app">
-      <Header destination={destination} stepCount={stepCount} viewMode={viewMode} setViewMode={setViewMode} />
+      <Header destination={destination} stepCount={stepCount} viewMode={viewMode} setViewMode={setViewMode} onOpenGraphExplorer={() => setShowGraphExplorer(true)} />
       <Breadcrumb path={path} onNavigate={navigateBackToStep} />
       <main className="main-content">
         <div className="game-controls">
@@ -209,10 +316,10 @@ function App() {
         
         {showOptimalPath && (
           <div className="optimal-path-display">
-            <h3>Optimal Path from {gameData.game_config.daily_puzzle.origin} to {destination}:</h3>
+            <h3>Optimal Path from {path[0]} to {destination}:</h3>
             <div className="optimal-path">
               {(() => {
-                const optimalPath = findOptimalPath(gameData.game_config.daily_puzzle.origin, destination)
+                const optimalPath = findOptimalPath(path[0], destination)
                 if (!optimalPath) return <p>No path found</p>
                 return (
                   <div className="path-steps">
@@ -246,17 +353,27 @@ function App() {
           <div className="loading">Loading...</div>
         )}
       </main>
+      
+      {/* Graph Explorer Modal */}
+      {showGraphExplorer && (
+        <GraphExplorer 
+          gameData={gameData}
+          onClose={() => setShowGraphExplorer(false)}
+          onNavigateToWord={(word) => {
+            setShowGraphExplorer(false)
+            navigateToWord(word)
+          }}
+        />
+      )}
     </div>
   )
 }
 
-function Header({ destination, stepCount, viewMode, setViewMode }) {
+function Header({ destination, stepCount, viewMode, setViewMode, onOpenGraphExplorer }) {
   const [showTooltip, setShowTooltip] = useState(false)
   
   // Get destination word data
-  const destWordData = gameData.master_words[destination] || 
-                      gameData.traits[destination] || 
-                      gameData.roles[destination]
+  const destWordData = gameData.findWord(destination)
   
   // Generate tooltip content
   const getTooltipContent = () => {
@@ -324,9 +441,312 @@ function Header({ destination, stepCount, viewMode, setViewMode }) {
           <div className="step-counter">
             Steps: {stepCount}
           </div>
+          <button 
+            className="button button-secondary"
+            onClick={onOpenGraphExplorer}
+            title="Explore Word Graph"
+          >
+            🔍 Graph
+          </button>
         </div>
       </div>
     </header>
+  )
+}
+
+function GraphExplorer({ gameData, onClose, onNavigateToWord }) {
+  const [filters, setFilters] = useState({
+    type: 'all', // 'all', 'thing', 'trait', 'role'
+    minChildren: 0,
+    maxChildren: 100,
+    minTraits: 0,
+    maxTraits: 20,
+    minAcquaintances: 0,
+    maxAcquaintances: 20,
+    searchTerm: ''
+  })
+  
+  const [sortBy, setSortBy] = useState('name') // 'name', 'children', 'traits', 'acquaintances', 'type'
+  const [sortDirection, setSortDirection] = useState('asc')
+  
+  // Get all words and apply filters
+  const allWords = Object.values(gameData.words)
+  const filteredWords = allWords.filter(word => {
+    // Type filter
+    if (filters.type !== 'all' && word.type !== filters.type) return false
+    
+    // Count filters
+    if (word.children.length < filters.minChildren || word.children.length > filters.maxChildren) return false
+    if (word.traits.length < filters.minTraits || word.traits.length > filters.maxTraits) return false
+    if (word.acquaintances.length < filters.minAcquaintances || word.acquaintances.length > filters.maxAcquaintances) return false
+    
+    // Search filter
+    if (filters.searchTerm && !word.word.toLowerCase().includes(filters.searchTerm.toLowerCase())) return false
+    
+    return true
+  })
+  
+  // Sort words
+  const sortedWords = [...filteredWords].sort((a, b) => {
+    let aVal, bVal
+    
+    switch (sortBy) {
+      case 'name':
+        aVal = a.word.toLowerCase()
+        bVal = b.word.toLowerCase()
+        break
+      case 'children':
+        aVal = a.children.length
+        bVal = b.children.length
+        break
+      case 'traits':
+        aVal = a.traits.length
+        bVal = b.traits.length
+        break
+      case 'acquaintances':
+        aVal = a.acquaintances.length
+        bVal = b.acquaintances.length
+        break
+      case 'type':
+        aVal = a.type
+        bVal = b.type
+        break
+      default:
+        return 0
+    }
+    
+    if (sortDirection === 'asc') {
+      return aVal < bVal ? -1 : aVal > bVal ? 1 : 0
+    } else {
+      return aVal > bVal ? -1 : aVal < bVal ? 1 : 0
+    }
+  })
+  
+  // Statistics
+  const stats = {
+    total: allWords.length,
+    filtered: filteredWords.length,
+    byType: {
+      thing: allWords.filter(w => w.type === 'thing').length,
+      trait: allWords.filter(w => w.type === 'trait').length,
+      role: allWords.filter(w => w.type === 'role').length
+    }
+  }
+  
+  const updateFilter = (key, value) => {
+    setFilters(prev => ({ ...prev, [key]: value }))
+  }
+  
+  const resetFilters = () => {
+    setFilters({
+      type: 'all',
+      minChildren: 0,
+      maxChildren: 100,
+      minTraits: 0,
+      maxTraits: 20,
+      minAcquaintances: 0,
+      maxAcquaintances: 20,
+      searchTerm: ''
+    })
+  }
+  
+  return (
+    <div className="graph-explorer-overlay">
+      <div className="graph-explorer">
+        <div className="graph-explorer-header">
+          <h2>🔍 Word Graph Explorer</h2>
+          <button className="close-btn" onClick={onClose}>✕</button>
+        </div>
+        
+        <div className="graph-explorer-content">
+          {/* Statistics Panel */}
+          <div className="stats-panel">
+            <h3>Statistics</h3>
+            <div className="stats-grid">
+              <div className="stat-item">
+                <span className="stat-label">Total Words:</span>
+                <span className="stat-value">{stats.total}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Filtered:</span>
+                <span className="stat-value">{stats.filtered}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Things:</span>
+                <span className="stat-value">{stats.byType.thing}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Traits:</span>
+                <span className="stat-value">{stats.byType.trait}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Roles:</span>
+                <span className="stat-value">{stats.byType.role}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Build Date:</span>
+                <span className="stat-value">{gameData.buildInfo.date}</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Filters Panel */}
+          <div className="filters-panel">
+            <div className="filters-header">
+              <h3>Filters</h3>
+              <button className="button button-small" onClick={resetFilters}>Reset</button>
+            </div>
+            
+            <div className="filters-grid">
+              {/* Search */}
+              <div className="filter-group">
+                <label>Search:</label>
+                <input
+                  type="text"
+                  value={filters.searchTerm}
+                  onChange={(e) => updateFilter('searchTerm', e.target.value)}
+                  placeholder="Type to search words..."
+                />
+              </div>
+              
+              {/* Type Filter */}
+              <div className="filter-group">
+                <label>Type:</label>
+                <select value={filters.type} onChange={(e) => updateFilter('type', e.target.value)}>
+                  <option value="all">All Types</option>
+                  <option value="thing">Things</option>
+                  <option value="trait">Traits</option>
+                  <option value="role">Roles</option>
+                </select>
+              </div>
+              
+              {/* Children Count */}
+              <div className="filter-group">
+                <label>Children: {filters.minChildren} - {filters.maxChildren}</label>
+                <div className="range-inputs">
+                  <input
+                    type="range"
+                    min="0"
+                    max="20"
+                    value={filters.minChildren}
+                    onChange={(e) => updateFilter('minChildren', parseInt(e.target.value))}
+                  />
+                  <input
+                    type="range"
+                    min="0"
+                    max="20"
+                    value={filters.maxChildren}
+                    onChange={(e) => updateFilter('maxChildren', parseInt(e.target.value))}
+                  />
+                </div>
+              </div>
+              
+              {/* Traits Count */}
+              <div className="filter-group">
+                <label>Traits: {filters.minTraits} - {filters.maxTraits}</label>
+                <div className="range-inputs">
+                  <input
+                    type="range"
+                    min="0"
+                    max="10"
+                    value={filters.minTraits}
+                    onChange={(e) => updateFilter('minTraits', parseInt(e.target.value))}
+                  />
+                  <input
+                    type="range"
+                    min="0"
+                    max="10"
+                    value={filters.maxTraits}
+                    onChange={(e) => updateFilter('maxTraits', parseInt(e.target.value))}
+                  />
+                </div>
+              </div>
+              
+              {/* Acquaintances Count */}
+              <div className="filter-group">
+                <label>Acquaintances: {filters.minAcquaintances} - {filters.maxAcquaintances}</label>
+                <div className="range-inputs">
+                  <input
+                    type="range"
+                    min="0"
+                    max="10"
+                    value={filters.minAcquaintances}
+                    onChange={(e) => updateFilter('minAcquaintances', parseInt(e.target.value))}
+                  />
+                  <input
+                    type="range"
+                    min="0"
+                    max="10"
+                    value={filters.maxAcquaintances}
+                    onChange={(e) => updateFilter('maxAcquaintances', parseInt(e.target.value))}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Sort Controls */}
+          <div className="sort-panel">
+            <h3>Sort</h3>
+            <div className="sort-controls">
+              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                <option value="name">Name</option>
+                <option value="type">Type</option>
+                <option value="children">Children Count</option>
+                <option value="traits">Traits Count</option>
+                <option value="acquaintances">Acquaintances Count</option>
+              </select>
+              <button 
+                className="button button-small"
+                onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
+              >
+                {sortDirection === 'asc' ? '↑' : '↓'}
+              </button>
+            </div>
+          </div>
+          
+          {/* Words List */}
+          <div className="words-panel">
+            <h3>Words ({sortedWords.length})</h3>
+            <div className="words-list">
+              {sortedWords.map(word => (
+                <div key={word.word} className={`word-item ${word.type}`}>
+                  <div className="word-header">
+                    <span 
+                      className="word-name"
+                      onClick={() => onNavigateToWord(word.word)}
+                    >
+                      {word.word}
+                    </span>
+                    <span className="word-type">{word.type}</span>
+                  </div>
+                  <div className="word-stats">
+                    <span>Children: {word.children.length}</span>
+                    <span>Traits: {word.traits.length}</span>
+                    <span>Acquaintances: {word.acquaintances.length}</span>
+                    {word.purposes.length > 0 && <span>Roles: {word.purposes.length}</span>}
+                    {word.exemplars.length > 0 && <span>Exemplars: {word.exemplars.length}</span>}
+                  </div>
+                  {word.parent && (
+                    <div className="word-parent">
+                      Parent: <span onClick={() => onNavigateToWord(word.parent)}>{word.parent}</span>
+                    </div>
+                  )}
+                  {word.children.length > 0 && (
+                    <div className="word-children">
+                      Children: {word.children.slice(0, 5).map(child => (
+                        <span key={child} onClick={() => onNavigateToWord(child)}>{child}</span>
+                      ))}
+                      {word.children.length > 5 && <span>... +{word.children.length - 5} more</span>}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -355,9 +775,7 @@ function Breadcrumb({ path, onNavigate }) {
 function WordPage({ wordData, onNavigate, allWords, viewMode }) {
   const renderWordLink = (word, className = '') => {
     // Check if this word exists in our data
-    const exists = allWords.master_words[word] || 
-                  allWords.traits[word] || 
-                  allWords.roles[word]
+    const exists = allWords.hasWord(word)
     
     if (!exists) return null
 
