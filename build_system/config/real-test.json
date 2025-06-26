@@ -1,0 +1,32 @@
+{
+  "targetWordCount": 20,
+  "dryRun": false,
+  "phases": {
+    "phase1": true,
+    "phase2": true,
+    "phase2_5": true,
+    "phase3": true,
+    "phase3_5": true,
+    "phase4": false
+  },
+  "api": {
+    "model": "gpt-4-turbo-preview",
+    "temperature": 0.7,
+    "maxRetries": 3,
+    "retryDelay": 1000,
+    "timeout": 30000,
+    "rateLimit": {
+      "maxConcurrent": 3,
+      "minDelay": 500
+    }
+  },
+  "clustering": {
+    "similarityThreshold": 0.8,
+    "minClusterSize": 3
+  },
+  "logging": {
+    "level": "INFO",
+    "logToFile": true,
+    "logToConsole": true
+  }
+}

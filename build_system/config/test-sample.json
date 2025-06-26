@@ -1,0 +1,31 @@
+{
+  "targetWordCount": 50,
+  "itemCounts": {
+    "children": { "min": 3, "max": 5 },
+    "traits": { "min": 3, "max": 5 },
+    "acquaintances": { "min": 3, "max": 5 },
+    "roles": { "min": 1, "max": 3 }
+  },
+  "retryConfig": {
+    "maxAttempts": 3,
+    "baseDelayMs": 1000,
+    "maxDelayMs": 10000
+  },
+  "embeddingThreshold": 0.8,
+  "promotionThreshold": 2,
+  "batchSize": {
+    "llmCalls": 1,
+    "embeddings": 100
+  },
+  "checkpointFrequency": 10,
+  "dryRun": false,
+  "verbose": true,
+  "phases": {
+    "phase1": true,
+    "phase2": true,
+    "phase2_5": true,
+    "phase3": true,
+    "phase3_5": true,
+    "phase4": false
+  }
+}

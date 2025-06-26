@@ -1,0 +1,29 @@
+{
+  "name": "six-degrees-builder",
+  "version": "1.0.0",
+  "description": "Build system for Six Degrees word graph",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build:test": "node index.js --config config/test-sample.json",
+    "build:full": "node index.js --config config/full-run.json",
+    "build:phase1": "node phases/phase1_tree_growth.js",
+    "build:phase2": "node phases/phase2_trait_normalization.js",
+    "build:phase2.5": "node phases/phase2_5_role_normalization.js",
+    "build:phase3": "node phases/phase3_acquaintance_adoption.js",
+    "build:phase3.5": "node phases/phase3_5_unified_index.js",
+    "test": "node test/test_runner.js"
+  },
+  "dependencies": {
+    "csv-parser": "^3.2.0",
+    "csv-writer": "^1.6.0",
+    "dotenv": "^16.5.0",
+    "ml-kmeans": "^6.0.0",
+    "natural": "^6.12.0",
+    "openai": "^4.104.0",
+    "pluralize": "^8.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.1.0"
+  }
+}

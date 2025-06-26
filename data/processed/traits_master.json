@@ -1,0 +1,50 @@
+{
+  "trait1": {
+    "word": "trait1",
+    "type": "trait",
+    "exemplars": [
+      "Animal",
+      "Dog",
+      "Horse",
+      "Place",
+      "Thing"
+    ],
+    "related_traits": []
+  },
+  "complex": {
+    "word": "complex",
+    "type": "trait",
+    "exemplars": [
+      "Bird",
+      "Concept",
+      "Place",
+      "System",
+      "Vehicle"
+    ],
+    "related_traits": []
+  },
+  "playful": {
+    "word": "playful",
+    "type": "trait",
+    "exemplars": [
+      "Bird",
+      "Cat",
+      "Concept",
+      "Dog",
+      "Fish",
+      "Furniture",
+      "Horse",
+      "Vehicle"
+    ],
+    "related_traits": []
+  },
+  "scaly": {
+    "word": "scaly",
+    "type": "trait",
+    "exemplars": [
+      "Bird",
+      "Fish"
+    ],
+    "related_traits": []
+  }
+}

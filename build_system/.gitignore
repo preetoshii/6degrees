@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+
+# Build outputs
+../data/processed/*
+../data/raw/*
+!../data/processed/.gitkeep
+!../data/raw/.gitkeep
+
+# Checkpoints
+checkpoints/*
+!checkpoints/.gitkeep
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store

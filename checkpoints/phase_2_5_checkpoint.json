@@ -1,0 +1,24 @@
+{
+  "checkpoint_version": "1.0",
+  "timestamp": "2025-06-26T18:04:58.150Z",
+  "phase": "2_5",
+  "data": {
+    "phase_complete": true,
+    "processed_words": [
+      "Object",
+      "Tool",
+      "Animal",
+      "System",
+      "Dog",
+      "Furniture",
+      "Vehicle"
+    ],
+    "total_roles_promoted": 2,
+    "total_clusters": 8
+  },
+  "stats": {
+    "words_processed": 0,
+    "errors_encountered": 0,
+    "api_calls_made": 0
+  }
+}

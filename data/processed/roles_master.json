@@ -1,0 +1,34 @@
+{
+  "companion": {
+    "word": "companion",
+    "type": "role",
+    "exemplars": [
+      "Animal",
+      "Dog",
+      "Furniture",
+      "System"
+    ],
+    "acquaintances": [
+      "friend",
+      "partner",
+      "confidant"
+    ]
+  },
+  "solar": {
+    "word": "solar",
+    "type": "role",
+    "exemplars": [
+      "Furniture",
+      "Object",
+      "System",
+      "Vehicle"
+    ],
+    "acquaintances": [
+      "Sustainability",
+      "Energy",
+      "Sunlight",
+      "Photovoltaics",
+      "Renewables"
+    ]
+  }
+}
