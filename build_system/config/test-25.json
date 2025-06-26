@@ -1,5 +1,5 @@
 {
-  "targetWordCount": 25,
+  "targetWordCount": 10,
   "dryRun": false,
   "phases": {
     "phase1": true,
@@ -12,44 +12,44 @@
   "api": {
     "model": "gpt-4-turbo-preview",
     "temperature": 0.7,
-    "maxRetries": 3,
-    "retryDelay": 1000,
-    "timeout": 30000,
+    "maxRetries": 2,
+    "retryDelay": 500,
+    "timeout": 60000,
     "rateLimit": {
-      "maxConcurrent": 3,
-      "minDelay": 500
+      "maxConcurrent": 5,
+      "minDelay": 200
     }
   },
   "itemCounts": {
     "children": {
       "min": 3,
-      "max": 5
+      "max": 4
     },
     "traits": {
       "min": 3,
-      "max": 5
+      "max": 4
     },
     "acquaintances": {
-      "min": 3,
-      "max": 5
+      "min": 2,
+      "max": 3
     },
     "roles": {
       "min": 1,
-      "max": 3
+      "max": 2
     }
   },
   "clustering": {
-    "similarityThreshold": 0.8,
-    "minClusterSize": 3
+    "similarityThreshold": 0.3,
+    "minClusterSize": 2
   },
   "batchSize": {
     "llmCalls": 1,
     "embeddings": 100
   },
   "retryConfig": {
-    "maxAttempts": 3,
-    "baseDelayMs": 1000,
-    "maxDelayMs": 10000
+    "maxAttempts": 2,
+    "baseDelayMs": 500,
+    "maxDelayMs": 5000
   },
   "embeddingThreshold": 0.8,
   "promotionThreshold": 2,

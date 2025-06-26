@@ -4,20 +4,22 @@
 # Variables: {{min}}, {{max}}, {{word}}
 # Returns: Comma-separated list of adjectives
 
-List {{min}}-{{max}} adjectives commonly used to describe "{{word}}" as a general category.
+List {{min}}-{{max}} distinct adjectives that describe "{{word}}" and would help players make connections in a word association game.
 
 Requirements:
-- Think about qualities that apply to ALL instances of {{word}}
-- If "{{word}}" is "Thing" (the most abstract), use universal qualities like: diverse, varied, tangible, abstract, real
-- For categories, think broadly about shared characteristics
+- Focus on CONCRETE, SPECIFIC traits that differentiate this category
+- Prioritize traits useful for gameplay connections (rideable, edible, portable, etc.)
+- Avoid overly generic words like "complex" unless truly distinctive
+- Include physical properties (size, material, texture), functions, and behaviors
+- For concrete objects, focus on how they're used, what they're made of, their size
+- For living things, include behaviors, diet, habitat, physical features
 - Must be actual adjectives (not nouns or verbs)
-- Focus on universal, culturally-neutral associations
 
 Return exactly {{min}}-{{max}} comma-separated adjectives only.
 
 Examples:
-- For "Thing": diverse, varied, tangible, abstract, real
-- For "System": complex, organized, interconnected, dynamic, structured
-- For "Animal": living, mobile, sentient, organic, instinctive
-- For "Cat": furry, agile, independent, curious, playful
-- For "Object": solid, tangible, physical, useful, material
+- For "Horse": rideable, large, domesticated, mammalian, four-legged
+- For "Chair": sittable, supportive, portable, manufactured, stable  
+- For "Cat": furry, agile, carnivorous, domesticated, small
+- For "Tool": handheld, useful, durable, manufactured, functional
+- For "Vehicle": mobile, mechanical, transportation, powered, enclosed

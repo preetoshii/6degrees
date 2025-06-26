@@ -24,7 +24,8 @@
     "build:status": "node scripts/build_status.js",
     "monitor": "node scripts/build_monitor.js",
     "monitor:once": "node scripts/build_monitor.js --once",
-    "update-frontend": "node scripts/update_frontend_data.js"
+    "update-frontend": "node scripts/update_frontend_data.js",
+    "bookmark": "node scripts/bookmark_build.js"
   },
   "dependencies": {
     "csv-parser": "^3.2.0",

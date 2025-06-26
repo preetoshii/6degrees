@@ -156,25 +156,17 @@ function App() {
   }, [path])
 
   const startNewGame = () => {
-    // Use daily puzzle if available, otherwise pick random start/end
-    let origin = 'Thing'
-    let destination = 'Horse'
-    
     const config = gameData.getGameConfig()
+    let origin, destination
+    
     if (config.daily_puzzle) {
       origin = config.daily_puzzle.origin
       destination = config.daily_puzzle.destination
     } else {
-      // Pick a random origin and destination from available words
-      const wordNames = gameData.getWordNames()
-      if (wordNames.length > 1) {
-        origin = wordNames[0] // Start with first word (likely "Thing")
-        // Pick a random destination that's not the origin
-        const possibleDests = wordNames.filter(w => w !== origin)
-        if (possibleDests.length > 0) {
-          destination = possibleDests[Math.floor(Math.random() * possibleDests.length)]
-        }
-      }
+      // Find random origin and destination with guaranteed path ~4 steps apart
+      const randomPair = findRandomWordPairWithPath(4, 6) // Target 4-6 steps
+      origin = randomPair.origin
+      destination = randomPair.destination
     }
     
     setCurrentWord(origin)
@@ -182,6 +174,47 @@ function App() {
     setPath([origin])
     setStepCount(0)
     setGameWon(false)
+  }
+
+  // Find two random words that have a path between them of target length
+  const findRandomWordPairWithPath = (minSteps = 4, maxSteps = 6) => {
+    const wordNames = gameData.getWordNames().filter(w => w !== 'Thing') // Exclude Thing from selection
+    const maxAttempts = 50 // Prevent infinite loops
+    
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      // Pick random origin (not Thing)
+      const origin = wordNames[Math.floor(Math.random() * wordNames.length)]
+      
+      // Pick random destination (not Thing)
+      const destination = wordNames[Math.floor(Math.random() * wordNames.length)]
+      
+      if (origin === destination) continue
+      
+      // Check if path exists and get its length (path won't include Thing)
+      const path = findOptimalPath(origin, destination)
+      if (path && path.length >= minSteps + 1 && path.length <= maxSteps + 1) {
+        console.log(`Found word pair: ${origin} → ${destination} (${path.length - 1} steps)`)
+        return { origin, destination, pathLength: path.length - 1 }
+      }
+    }
+    
+    // Fallback: find any valid pair if we can't find one in target range
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const origin = wordNames[Math.floor(Math.random() * wordNames.length)]
+      const destination = wordNames[Math.floor(Math.random() * wordNames.length)]
+      
+      if (origin === destination) continue
+      
+      const path = findOptimalPath(origin, destination)
+      if (path && path.length >= 3) { // At least 2 steps
+        console.log(`Fallback word pair: ${origin} → ${destination} (${path.length - 1} steps)`)
+        return { origin, destination, pathLength: path.length - 1 }
+      }
+    }
+    
+    // Final fallback: Animal -> Dog (a simple path that doesn't use Thing)
+    console.log('Using final fallback: Animal → Dog')
+    return { origin: 'Animal', destination: 'Dog', pathLength: 1 }
   }
 
   const navigateToWord = (wordName) => {
@@ -252,6 +285,9 @@ function App() {
       ]
       
       for (const nextWord of connections) {
+        // Skip "Thing" to make paths more interesting
+        if (nextWord === 'Thing') continue
+        
         if (nextWord === end) {
           return [...currentPath, nextWord]
         }
@@ -823,10 +859,10 @@ function WordPage({ wordData, onNavigate, allWords, viewMode }) {
 
     // Children description
     if (wordData.children && wordData.children.length > 0) {
-      const childLinks = wordData.children.slice(0, 3).map(child => renderWordLink(child, 'inline-link'))
+      const childLinks = wordData.children.map(child => renderWordLink(child, 'inline-link'))
       descriptions.push(
         <p key="children">
-          Some examples of {wordData.word.toLowerCase()} include {childLinks.reduce((prev, curr, i) => [prev, i === childLinks.length - 1 ? ' and ' : ', ', curr])}{wordData.children.length > 3 && ', among others'}.
+          Some examples of {wordData.word.toLowerCase()} include {childLinks.reduce((prev, curr, i) => [prev, i === childLinks.length - 1 ? ' and ' : ', ', curr])}.
         </p>
       )
     }
@@ -843,7 +879,7 @@ function WordPage({ wordData, onNavigate, allWords, viewMode }) {
 
     // Acquaintances description
     if (wordData.acquaintances && wordData.acquaintances.length > 0) {
-      const acqLinks = wordData.acquaintances.slice(0, 4).map(acq => renderWordLink(acq, 'inline-link'))
+      const acqLinks = wordData.acquaintances.map(acq => renderWordLink(acq, 'inline-link'))
       descriptions.push(
         <p key="acquaintances">
           When thinking about {wordData.word.toLowerCase()}, one might also think of {acqLinks.reduce((prev, curr, i) => [prev, i === acqLinks.length - 1 ? ' and ' : ', ', curr])}.
@@ -863,7 +899,7 @@ function WordPage({ wordData, onNavigate, allWords, viewMode }) {
 
     // Exemplars description (for traits)
     if (wordData.exemplars && wordData.exemplars.length > 0) {
-      const exemplarLinks = wordData.exemplars.slice(0, 3).map(ex => renderWordLink(ex, 'inline-link'))
+      const exemplarLinks = wordData.exemplars.map(ex => renderWordLink(ex, 'inline-link'))
       descriptions.push(
         <p key="exemplars">
           Things that are particularly {wordData.word.toLowerCase()} include {exemplarLinks.reduce((prev, curr, i) => [prev, i === exemplarLinks.length - 1 ? ' and ' : ', ', curr])}.
