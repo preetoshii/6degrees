@@ -134,14 +134,14 @@ d. **Generate via four separate LLM calls (GPT-4 Turbo):**
 1) **Children Prompt**
    ```
    "List 3-5 common subtypes of [currentWord], ranked by commonality.
-   Return exactly that many comma-separated nouns only."
+   Return comma-separated nouns only. Count should be between 3-5 based on how many strong examples exist."
    ```
    ↪️ Retry up to 2× if count not in range 3-5 or format invalid.
 
 2) **Traits Prompt**
    ```
    "List 3-5 adjectives most people associate with [currentWord], ranked by frequency.
-   Return exactly that many comma-separated words only."
+   Return comma-separated adjectives only. Count should be between 3-5 based on salience."
    ```
    ↪️ Retry if needed.
 
@@ -149,7 +149,7 @@ d. **Generate via four separate LLM calls (GPT-4 Turbo):**
    ```
    "List 3-5 nouns that co-occur with [currentWord] in thought/experience,
    excluding [parentTerm], [childTerms], [traitTerms], [synonymTerms].
-   Return exactly that many comma-separated nouns only."
+   Return comma-separated nouns only. Count should be between 3-5 based on strength of association."
    ```
    ↪️ Retry if exclusions appear or count not in range 3-5.
 
@@ -168,9 +168,10 @@ d. **Generate via four separate LLM calls (GPT-4 Turbo):**
 d.1. **Exclusion-List Validation** (After each LLM call)
 - For acquaintances generation, verify no excluded terms appear in the response
 - Excluded terms: parent, children, traits, synonyms
+- Also verify acquaintances don't create ancestor cycles (using isAncestor check from step f)
 - If violation detected: append "do not include [excludedTerm]" clause to prompt and retry once
 - If still invalid: drop the excluded term and log warning
-- Rationale: Prevents semantic pollution that could cascade downstream and break graph integrity
+- Rationale: Prevents semantic pollution and cycles that could cascade downstream and break graph integrity
 
 e. **Mark children as done**
 - record.stages.childrenDone = true
@@ -180,6 +181,20 @@ f. **Normalize & Deduplicate Children**
 For each childCandidate:
 - norm = lowercase(singularize(childCandidate))
 - if (!master_words.json.find(w ⇒ normalize(w.word)==norm)):
+  - **Cycle Detection**: Ensure childCandidate is not an ancestor of currentWord
+    ```javascript
+    function isAncestor(candidate, currentWord):
+      let node = master_words.json.find(w => w.word === currentWord)
+      while (node && node.parent) {
+        if (normalize(node.parent) === normalize(candidate)) return true
+        node = master_words.json.find(w => w.word === node.parent)
+      }
+      return false
+    }
+    ```
+  - If isAncestor(childCandidate, currentWord): 
+    - Log warning: "Skipping {childCandidate} as child of {currentWord} - would create cycle"
+    - Continue to next candidate
   - append newRecord {
       word: childCandidate, type:"thing", parent:currentWord,
       children:[], traits:[], acquaintances:[],
@@ -245,10 +260,48 @@ i. **Throttle & Back-off**
 - On crash/restart, rebuild queue from any words where either flag == false.
 - No separate "seen" set needed—JSON is the single source of truth.
 
+#### Checkpoint Format Specification
+```json
+{
+  "checkpoint_version": "1.0",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "phase": 1,
+  "last_processed_word": "Cat",
+  "queue_state": ["Dog", "Bird", "Fish"],
+  "stats": {
+    "words_processed": 1250,
+    "errors_encountered": 23,
+    "api_calls_made": 5000
+  },
+  "checksum": "sha256_hash_of_master_words_json"
+}
+```
+- Write checkpoint after every 10 words processed
+- Store in `checkpoints/phase_{n}_checkpoint.json`
+- On restart, validate checksum matches current master_words.json
+
 ### 🚑 Crash Recovery & Re-Runs
 
 - Safe to re-run; uncompleted nodes pick up exactly where they left off.
 - A small "reset" script can clear all `stages` flags if you want a fresh run.
+- Queue ordering on restart: Process in BFS order from root to maintain consistency
+
+#### Indexing Strategy for O(1) Lookups
+```javascript
+// Build once on startup, update incrementally
+const wordIndex = {
+  "cat": { index: 0, normalized: "cat" },
+  "cats": { index: 0, normalized: "cat" },  // plurals map to same
+  "dog": { index: 1, normalized: "dog" },
+  // ... etc
+}
+
+// Usage for validation
+function wordExists(word) {
+  const normalized = normalize(word)
+  return wordIndex[normalized] !== undefined
+}
+```
 
 ### ✅ Benefits
 
@@ -362,6 +415,19 @@ c. **Synonym Merge**
 3. **Promote only traits ≥ 2 exemplars**
 4. **Persistent writes after each promotion**
 5. **Resumable on crash/restart**
+
+#### Embedding Batch Processing
+```python
+# Instead of individual calls:
+for label in allRawTraits:
+    embedding = get_embedding(label)  # 1 API call each
+
+# Use batch processing:
+embeddings = get_embeddings(allRawTraits, batch_size=100)  # 5 API calls for 500 traits
+```
+- OpenAI embeddings API supports up to 2048 inputs per request
+- Batch in groups of 100 for optimal latency/throughput balance
+- Reduces API calls by 95%+
 
 These steps ensure Phase 2 is reliable, repeatable, and crash-safe.
 
@@ -537,14 +603,15 @@ For each `acq` + its `shortlist`:
 - If `isDescendant(chosenParent, acq)` returns true:
   - Remove `chosenParent` from shortlist
   - Re-prompt LLM with remaining candidates
-  - If shortlist exhausted, fall back to safe high-level parent (e.g., "Thing")
+  - If shortlist exhausted, continue with expanded fallback strategy (see below)
 
 **Comprehensive Fallback Strategy**:
 1. If initial LLM choice fails validation → try next best candidates from shortlist
-2. If top candidates create cycles → remove and retry with remaining shortlist items
+2. If top candidates create cycles → remove and retry with remaining shortlist items  
 3. If validation fails → try relaxing criteria and re-evaluate shortlist
 4. If all shortlist candidates exhausted → expand search to top 30-40 candidates
-5. Ultimate fallback → assign to "Thing" with detailed warning log for manual review
+5. If expanded search exhausted → increase to top 50-60 candidates with embedding threshold lowered to 0.7
+6. Ultimate fallback → Use LLM to find the most semantically appropriate high-level category from existing nodes (e.g., "Concept", "Object", "System") - never defaulting to a single preset category
 - This prevents circular hierarchies (A→B→C→A) that would break tree traversal algorithms.
 - **Rationale**: Maintains acyclic graph structure essential for difficulty tuning, analytics, and debugging.
 
