@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Six Degrees - Game Design Document Viewer</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav {
+            background: #2c3e50;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav a:hover, .nav a.active {
+            background-color: #34495e;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #7f8c8d;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+        }
+
+        /* Markdown styling */
+        .markdown-content h1 {
+            font-size: 3rem;
+            margin: 4rem 0 2rem 0;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            color: #2c3e50;
+            border-bottom: 4px solid #667eea;
+            padding-bottom: 0.7rem;
+        }
+
+        .markdown-content h2 {
+            font-size: 2.2rem;
+            margin: 3rem 0 1.5rem 0;
+            font-weight: 800;
+            color: #3a4a6b;
+            border-bottom: 2px solid #bdc3c7;
+            padding-bottom: 0.5rem;
+        }
+
+        .markdown-content h3 {
+            font-size: 1.6rem;
+            margin: 2.5rem 0 1.2rem 0;
+            font-weight: 700;
+            color: #34495e;
+        }
+
+        .markdown-content h4 {
+            font-size: 1.3rem;
+            margin: 2rem 0 1rem 0;
+            font-weight: 600;
+            color: #7f8c8d;
+        }
+
+        .markdown-content p, .markdown-content ul, .markdown-content ol {
+            margin-bottom: 1.4rem;
+        }
+
+        .markdown-content ul, .markdown-content ol {
+            margin-top: 0.5rem;
+            padding-left: 2.2rem;
+        }
+
+        .markdown-content li {
+            margin-bottom: 0.7rem;
+        }
+
+        .markdown-content hr {
+            border: none;
+            border-top: 2px solid #eee;
+            margin: 4rem 0;
+        }
+
+        .markdown-content strong, .markdown-content b {
+            color: #2c3e50;
+        }
+
+        .markdown-content code {
+            background-color: #f8f9fa;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e74c3c;
+        }
+
+        .markdown-content pre {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            box-shadow: none;
+        }
+
+        .markdown-content pre code {
+            background: none !important;
+            color: inherit !important;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        .markdown-content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #7f8c8d;
+        }
+
+        .markdown-content .highlight {
+            background-color: #fff3cd;
+            padding: 1rem;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .nav ul {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Six Degrees</h1>
+            <p>Game Design Document Viewer</p>
+        </div>
+
+        <nav class="nav">
+            <ul>
+                <li><a onclick="loadSection('00_OVERVIEW.md')" class="active">Overview</a></li>
+                <li><a onclick="loadSection('01_WORD_TYPES.md')">Word Types</a></li>
+                <li><a onclick="loadSection('02_STRATEGY_AND_CHALLENGES.md')">Strategy & Challenges</a></li>
+                <li><a onclick="loadSection('03_BUILD_FLOW.md')">Build Flow</a></li>
+                <li><a onclick="loadSection('05_FRONT_END.md')">Front End</a></li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <div id="markdown-content" class="markdown-content">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configure marked.js
+        marked.setOptions({
+            breaks: true,
+            gfm: true
+        });
+
+        // Load and display markdown content
+        async function loadSection(filename) {
+            const contentDiv = document.getElementById('markdown-content');
+            
+            // Show loading
+            contentDiv.innerHTML = '<div class="loading">Loading...</div>';
+            
+            // Update navigation
+            document.querySelectorAll('.nav a').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            try {
+                // Load the markdown file
+                const response = await fetch(`GDD/${filename}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const markdownText = await response.text();
+                
+                // Convert markdown to HTML
+                const htmlContent = marked.parse(markdownText);
+                
+                // Display the content
+                contentDiv.innerHTML = htmlContent;
+                
+            } catch (error) {
+                console.error('Error loading markdown file:', error);
+                contentDiv.innerHTML = `
+                    <div class="error">
+                        <h3>Error Loading Content</h3>
+                        <p>Could not load ${filename}. Please make sure the file exists in the GDD folder.</p>
+                        <p>Error details: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Load the first section by default
+        window.addEventListener('load', function() {
+            loadSection('00_OVERVIEW.md');
+        });
+    </script>
+</body>
+</html> 
