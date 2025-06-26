@@ -86,3 +86,46 @@ If a build fails, simply run the same command again. The system will:
 1. Load the last checkpoint
 2. Skip already-processed words
 3. Continue from where it left off
+
+## Testing & Quality Assurance
+
+The project includes a comprehensive testing framework documented in `GDD/05_TESTING.md`. After each build:
+
+1. Run the build analyzer:
+   ```bash
+   node scripts/analyze_build.js
+   ```
+
+2. Review the automated analysis for:
+   - Structural integrity (connectivity, cycles)
+   - Connection density (aim for 4-7 per word)
+   - Relationship distribution
+
+3. Perform manual testing per the framework:
+   - Semantic quality checks
+   - Game design alignment
+   - Prompt effectiveness
+
+4. Archive builds with analysis:
+   ```
+   data/archive/
+   └── build_YYYY-MM-DD_Xw/
+       ├── unified_master.json
+       ├── build_analysis.md
+       └── config_used.json
+   ```
+
+## Known Issues (Current Build)
+
+- Low trait generation (0.13 per word vs expected 3-5)
+- Sparse connections (2.66 average vs expected 4-7)
+- Abstract words getting poor LLM responses
+- Some words not fully processed
+
+## Next Steps
+
+1. Fix trait/acquaintance prompts for abstract words
+2. Ensure complete processing of all words
+3. Increase connection density for better gameplay
+4. Run smaller test builds (25 words) to debug prompts
+5. Implement natural language generation phase
