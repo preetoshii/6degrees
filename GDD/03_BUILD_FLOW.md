@@ -6,7 +6,48 @@
 - All LLM calls include automatic retry loops (2-3 attempts) with exponential backoff
 - Network failures trigger immediate retry with jittered delay
 - Malformed responses beyond retry threshold: log warning and skip item (with notification)
-- Orphan adoption failures: fall back to high-level parent (e.g., "Thing") with warning
+- Orphan adoption failures: try next best candidates from shortlist; ultimate fallback to high-level parent (e.g., "Thing") with warning
+
+**Comprehensive Error Specifications**:
+
+1. **LLM API Errors**:
+   - HTTP 429 (Rate Limit): Exponential backoff starting at 1s, max 10s, with jitter
+   - HTTP 500-503 (Server Error): Retry 3x with 2s delays
+   - Timeout (>30s): Retry once, then log and skip
+   - Invalid API Key: Fatal error, halt pipeline with clear message
+   - Response Format Errors: Retry with refined prompt, then skip if persistent
+
+2. **Data Validation Errors**:
+   - Missing required fields: Log specific field, use defaults where safe
+   - Invalid word types: Log and skip entry
+   - Circular parent-child relationships: Detect and break cycle, log for review
+   - Duplicate words: Merge metadata, prefer existing entry
+   - Orphaned references: Queue for Phase 3 adoption
+
+3. **File System Errors**:
+   - Write failures: Retry 3x, then write to backup location
+   - Read failures: Check backup locations, use cached version if available
+   - Corrupted JSON: Attempt repair, restore from last valid checkpoint
+   - Disk space issues: Alert and pause pipeline
+
+4. **Pipeline State Errors**:
+   - Incomplete stage flags: Resume from last completed stage
+   - Missing checkpoint data: Rebuild from previous valid state
+   - Concurrent modification: Use file locking, queue conflicting operations
+
+5. **Logging & Monitoring**:
+   - Error categories: API, Validation, FileSystem, State, Logic
+   - Log levels: ERROR (failures), WARN (recoverable), INFO (progress)
+   - Log format: `[timestamp] [level] [category] [phase] [word] message`
+   - Aggregate metrics: Success rate per phase, retry counts, skip counts
+   - Alert thresholds: >5% skip rate, >10% retry rate, any fatal errors
+
+6. **Recovery Strategies**:
+   - Checkpoint after each completed word (not just phase completion)
+   - Maintain rolling backups of master files (keep last 3 versions)
+   - Graceful degradation: Continue with partial data rather than full stop
+   - Manual intervention points: Clear documentation of fix procedures
+   - Diagnostic commands: Verify graph integrity, find orphans, check cycles
 
 **Central Configuration**:
 All build parameters are driven by a single `config.json` file:
@@ -92,25 +133,25 @@ d. **Generate via four separate LLM calls (GPT-4 Turbo):**
 
 1) **Children Prompt**
    ```
-   "List exactly 7 common subtypes of [currentWord], ranked by commonality.
-   Return 7 comma-separated nouns only."
+   "List 3-5 common subtypes of [currentWord], ranked by commonality.
+   Return exactly that many comma-separated nouns only."
    ```
-   ↪️ Retry up to 2× if count≠7 or format invalid.
+   ↪️ Retry up to 2× if count not in range 3-5 or format invalid.
 
 2) **Traits Prompt**
    ```
-   "List exactly 7 adjectives most people associate with [currentWord], ranked by frequency.
-   Return 7 comma-separated words only."
+   "List 3-5 adjectives most people associate with [currentWord], ranked by frequency.
+   Return exactly that many comma-separated words only."
    ```
    ↪️ Retry if needed.
 
 3) **Acquaintances Prompt**
    ```
-   "List exactly 7 nouns that co-occur with [currentWord] in thought/experience,
+   "List 3-5 nouns that co-occur with [currentWord] in thought/experience,
    excluding [parentTerm], [childTerms], [traitTerms], [synonymTerms].
-   Return 7 comma-separated nouns only."
+   Return exactly that many comma-separated nouns only."
    ```
-   ↪️ Retry if exclusions appear or count≠7.
+   ↪️ Retry if exclusions appear or count not in range 3-5.
 
 4) **Roles Prompt**
    ```
@@ -176,7 +217,7 @@ i. **Throttle & Back-off**
   "word": "Cat",
   "type": "thing",
   "parent": "Animal",
-  "children": ["Siamese","Tabby",…],   # 7 items
+  "children": ["Siamese","Tabby",…],   # 3-5 items
   "traits": [],                      # placeholders
   "purposes": [],                    # placeholders
   "stages": {
@@ -380,7 +421,7 @@ c. **Synonym Merge**
 
 ### 7. Generate Role Acquaintances
 - **🔄 For each promoted Role Word:**
-  - Use LLM to generate 5-7 acquaintances that co-occur with the role concept.
+  - Use LLM to generate 3-5 acquaintances that co-occur with the role concept.
   - Store these in the Role Word's `acquaintances` array.
   - These acquaintances will be processed in Phase 3 (Acquaintance Adoption).
 
@@ -407,7 +448,7 @@ c. **Synonym Merge**
 
 - **LLM Calls for Acquaintances**
   - Model: GPT-4 Turbo
-  - Purpose: Generate 5-7 acquaintances per promoted Role Word.
+  - Purpose: Generate 3-5 acquaintances per promoted Role Word.
   - Cost: ~100 tokens/role × ~100 roles ≈ 10 000 tokens → **$0.04**.
 
 - **Total Cost Estimate**
@@ -497,6 +538,13 @@ For each `acq` + its `shortlist`:
   - Remove `chosenParent` from shortlist
   - Re-prompt LLM with remaining candidates
   - If shortlist exhausted, fall back to safe high-level parent (e.g., "Thing")
+
+**Comprehensive Fallback Strategy**:
+1. If initial LLM choice fails validation → try next best candidates from shortlist
+2. If top candidates create cycles → remove and retry with remaining shortlist items
+3. If validation fails → try relaxing criteria and re-evaluate shortlist
+4. If all shortlist candidates exhausted → expand search to top 30-40 candidates
+5. Ultimate fallback → assign to "Thing" with detailed warning log for manual review
 - This prevents circular hierarchies (A→B→C→A) that would break tree traversal algorithms.
 - **Rationale**: Maintains acyclic graph structure essential for difficulty tuning, analytics, and debugging.
 
@@ -505,7 +553,9 @@ For each `acq` + its `shortlist`:
   ```
   "Is [orphan] a kind of [parent]? Answer yes or no only."
   ```
-- If validation fails (answer = "no"), log the case for review and consider retry with different shortlist.
+- If validation fails (answer = "no"), try next best candidate from shortlist.
+- Continue through shortlist until valid parent found or list exhausted.
+- Log all failed attempts for pattern analysis and model improvement.
 - This lightweight check catches edge-case misclassifications due to polysemy or fuzzy category boundaries.
 - Example failure cases: "Mercury" (planet vs. metal vs. deity), "Democracy" under "Food".
 - **Rationale**: Prevents semantic violations that could disrupt traversal and confuse players.
@@ -813,4 +863,21 @@ This phase bridges the gap between the modular build process and the unified fro
 - **🔁 Future-Proof**: Easy to re-run when definitions change
 - **🧠 Cognitive Glue**: Makes the graph feel alive and explorable instead of abstract
 - **🧩 Front-End Ready**: UI link logic is metadata-driven, not tied to string parsing
+
+---
+
+## Future Considerations
+
+### Homonym & Word Sense Disambiguation
+**TODO**: Establish a homonym-resolution strategy in a later iteration. Potential approaches:
+- Lexical context analysis to differentiate word senses (e.g., "Bank" - financial vs river)
+- Manual override lists for known ambiguous terms
+- Separate nodes for distinct meanings with disambiguation suffixes
+- Accept some ambiguity as natural part of human language
+
+### Additional Quality Controls
+- Automated graph analysis to detect isolated subgraphs
+- Semantic validation of parent-child relationships using additional LLM checks
+- Player telemetry to identify confusing or broken paths
+- Version control and rollback capabilities for graph updates
 

@@ -268,6 +268,14 @@ As with Traits, Role definitions grow richer as the graph expands. Role Words he
 • Roles give players a new strategic traversal dimension: function.
 • **Bidirectional consistency** ensures that clicking on a Role shows all Things that perform that function, and clicking on a Thing shows its Roles with confidence that the Role node truly connects back.
 
+### 📐 Grammatical Distinction: Traits vs. Roles
+
+**No Overlap By Design**: The grammatical structure of Traits and Roles ensures they never overlap:
+- **Traits** are ALWAYS adjectives (descriptive qualities): "Sharp," "Heavy," "Bright," "Complex"
+- **Roles** are ALWAYS nouns (gerunds or abstracts): "Cutting," "Weighing," "Illumination," "Analysis"
+
+This fundamental grammatical difference means a word can never be both a Trait and a Role. Even when concepts seem related (e.g., "Sharp" as a trait vs. "Cutting" as a role), they remain distinct word types serving different navigational purposes in the graph.
+
 ### 📎 Notes
 
 • Roles are only generated when the Thing Word is clearly purpose-centered.  

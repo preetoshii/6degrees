@@ -1,5 +1,7 @@
 # Front End
 
+**Note**: This front-end documentation provides initial scaffolding and basic structure for the game interface. It's intended as a starting point that will be refined and enhanced through user testing and iterative development. The core navigation mechanics and data display patterns described here form the foundation, but visual design, animations, and polish will evolve.
+
 ## 🎮 Front-End User Experience
 
 ### 1. Launch & Intro Screen
