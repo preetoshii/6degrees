@@ -1,0 +1,27 @@
+# Phase 1: Roles Generation Prompt
+# Used in: phase1_tree_growth.js
+# Purpose: Generate functional roles/purposes for a word (only when applicable)
+# Variables: {{min}}, {{max}}, {{word}}
+# Returns: Comma-separated gerunds/functional nouns or "NONE"
+
+For the word "{{word}}", determine if it has a primary functional purpose.
+
+Tools, professions, and service systems have functional purposes:
+- Hammer → hammering, building
+- Teacher → teaching, educating
+- Hospital → healing, treating
+
+Most things do NOT have functional purposes:
+- Animals (Cat, Dog) → NONE
+- Abstract categories (Thing, Object, Concept) → NONE
+- Natural objects (Tree, Rock) → NONE
+- General categories (System, Place) → NONE
+
+If "{{word}}" has a clear functional purpose, list {{min}}-{{max}} gerunds (verb+ing).
+Otherwise, return exactly: NONE
+
+Examples:
+- "Hammer": hammering, building, demolishing
+- "Thing": NONE
+- "Object": NONE
+- "System": NONE

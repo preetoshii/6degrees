@@ -286,7 +286,14 @@ function Header({ destination, stepCount, viewMode, setViewMode }) {
   return (
     <header className="header">
       <div className="header-content">
-        <h1>Six Degrees</h1>
+        <div className="title-section">
+          <h1>Six Degrees</h1>
+          {gameData.buildInfo && (
+            <div className="build-info">
+              Data: {gameData.buildInfo.date}
+            </div>
+          )}
+        </div>
         <div className="game-info">
           <div className="view-toggle">
             <button 

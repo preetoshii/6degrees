@@ -1,6 +1,6 @@
 {
   "checkpoint_version": "1.0",
-  "timestamp": "2025-06-26T18:04:58.150Z",
+  "timestamp": "2025-06-26T20:50:37.254Z",
   "phase": "2_5",
   "data": {
     "phase_complete": true,
@@ -11,10 +11,15 @@
       "System",
       "Dog",
       "Furniture",
-      "Vehicle"
+      "Vehicle",
+      "Thing",
+      "Concept",
+      "Container",
+      "Device",
+      "Computer"
     ],
-    "total_roles_promoted": 2,
-    "total_clusters": 8
+    "total_roles_promoted": 3,
+    "total_clusters": 3
   },
   "stats": {
     "words_processed": 0,

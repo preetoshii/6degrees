@@ -8,13 +8,41 @@ import { runPhase3 } from './phases/phase3_acquaintance_adoption.js';
 import { runPhase3_5 } from './phases/phase3_5_unified_index.js';
 import { createLogger, summaryLogger } from './utils/logger.js';
 import { monitor } from './utils/monitor.js';
+import { archiveBuild } from './utils/archive_utils.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs/promises';
 
 const logger = createLogger('Main');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const STATUS_FILE = path.join(__dirname, '.build_status.json');
+
+// Status tracking functions
+async function writeStatus(status, config = null, error = null) {
+  const statusData = {
+    status,
+    startTime: status === 'running' ? new Date().toISOString() : (await readStatus())?.startTime,
+    endTime: ['completed', 'failed'].includes(status) ? new Date().toISOString() : null,
+    config: config || (await readStatus())?.config,
+    targetWords: config ? (await readJSON(config))?.targetWordCount : null,
+    error: error || null,
+    exitCode: null
+  };
+  
+  await fs.writeFile(STATUS_FILE, JSON.stringify(statusData, null, 2));
+}
+
+async function readStatus() {
+  try {
+    const data = await fs.readFile(STATUS_FILE, 'utf-8');
+    return JSON.parse(data);
+  } catch (e) {
+    return null;
+  }
+}
 
 // Parse command line arguments
 function parseArgs() {
@@ -22,7 +50,8 @@ function parseArgs() {
   const options = {
     config: path.join(__dirname, 'config/test-sample.json'),
     phases: null,
-    help: false
+    help: false,
+    noArchive: false
   };
   
   for (let i = 0; i < args.length; i++) {
@@ -38,6 +67,9 @@ function parseArgs() {
       case '--help':
       case '-h':
         options.help = true;
+        break;
+      case '--no-archive':
+        options.noArchive = true;
         break;
     }
   }
@@ -55,6 +87,7 @@ Usage: node index.js [options]
 Options:
   --config, -c <path>     Config file path (default: config/test-sample.json)
   --phases, -p <phases>   Comma-separated list of phases to run (default: all enabled in config)
+  --no-archive            Disable automatic archiving after build
   --help, -h              Show this help message
 
 Examples:
@@ -82,6 +115,9 @@ async function main() {
   
   await logger.info('=== Six Degrees Build System Starting ===');
   
+  // Initialize status tracking
+  await writeStatus('running', options.config);
+  
   // Load config
   const config = await readJSON(options.config);
   if (!config) {
@@ -89,6 +125,10 @@ async function main() {
     console.error(`Config file not found: ${options.config}`);
     process.exit(1);
   }
+  
+  // Store options in config for later use
+  config.configFile = options.config;
+  config.noArchive = options.noArchive;
   
   await logger.info('Configuration loaded', {
     configFile: options.config,
@@ -151,11 +191,42 @@ async function main() {
     console.log(`\nFull logs available at: ${logger.getLogFile()}`);
     console.log(`Summary available at: ${summaryLogger.getSummaryFile()}`);
     
+    // Auto-archive successful build (unless disabled)
+    if (!config.noArchive) {
+      const archiveName = await archiveBuild({
+        success: true,
+        configFile: config.configFile || 'custom',
+        stats: finalReport
+      });
+      console.log(`\n✅ Build automatically archived: ${archiveName}`);
+    }
+    
+    // Mark as completed
+    await writeStatus('completed');
+    
   } catch (error) {
     await logger.error('Build failed', error);
     await summaryLogger.logError('main', error);
     console.error('Build failed:', error);
     console.log(`\nCheck logs for details: ${logger.getLogFile()}`);
+    
+    // Auto-archive failed build (unless disabled)
+    if (!config.noArchive) {
+      try {
+        const archiveName = await archiveBuild({
+          success: false,
+          errorDetails: error.message || 'Unknown error',
+          configFile: config.configFile || 'custom',
+          stats: monitor.getStats()
+        });
+        console.log(`\n❌ Failed build automatically archived: ${archiveName}`);
+      } catch (archiveError) {
+        console.error('Failed to archive build:', archiveError.message);
+      }
+    }
+    
+    // Mark as failed
+    await writeStatus('failed', null, error.message);
     process.exit(1);
   }
 }

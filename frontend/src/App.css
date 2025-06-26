@@ -34,9 +34,21 @@ body {
   align-items: center;
 }
 
+.title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 .header h1 {
   font-size: 1.5rem;
   font-weight: 600;
+}
+
+.build-info {
+  font-size: 0.75rem;
+  color: #bdc3c7;
+  font-weight: 400;
 }
 
 .game-info {

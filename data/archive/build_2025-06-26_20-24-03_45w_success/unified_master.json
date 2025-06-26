@@ -1,0 +1,808 @@
+{
+  "master_words": {
+    "Thing": {
+      "word": "Thing",
+      "type": "thing",
+      "parent": null,
+      "children": [
+        "Animal",
+        "Object",
+        "Concept",
+        "System",
+        "Place",
+        "possession",
+        "stuff",
+        "veterinarian",
+        "material"
+      ],
+      "traits": [
+        "complex"
+      ],
+      "acquaintances": [
+        "Object",
+        "item",
+        "possession",
+        "stuff",
+        "belonging"
+      ],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "traitsPromoted": true,
+        "rolesPromoted": false
+      }
+    },
+    "Animal": {
+      "word": "Animal",
+      "type": "thing",
+      "parent": "Thing",
+      "children": [
+        "Cat",
+        "Dog",
+        "Bird",
+        "Fish",
+        "Horse",
+        "pet",
+        "wildlife"
+      ],
+      "traits": [
+        "complex"
+      ],
+      "acquaintances": [
+        "zoo",
+        "habitat",
+        "pet",
+        "wildlife",
+        "veterinarian"
+      ],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "traitsPromoted": true,
+        "rolesPromoted": false
+      }
+    },
+    "Object": {
+      "word": "Object",
+      "type": "thing",
+      "parent": "Thing",
+      "children": [
+        "Furniture",
+        "Vehicle",
+        "Tool",
+        "Container",
+        "Device",
+        "item",
+        "shape",
+        "body"
+      ],
+      "traits": [
+        "complex"
+      ],
+      "acquaintances": [
+        "shape",
+        "material",
+        "function",
+        "use",
+        "ownership"
+      ],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "traitsPromoted": true,
+        "rolesPromoted": false
+      }
+    },
+    "Concept": {
+      "word": "Concept",
+      "type": "thing",
+      "parent": "Thing",
+      "children": [
+        "Idea",
+        "Theory",
+        "Belief",
+        "Principle",
+        "Value",
+        "belonging",
+        "use",
+        "notion",
+        "understanding",
+        "education"
+      ],
+      "traits": [
+        "complex"
+      ],
+      "acquaintances": [
+        "Idea",
+        "Theory",
+        "Principle",
+        "notion",
+        "understanding"
+      ],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "traitsPromoted": true,
+        "rolesPromoted": false
+      }
+    },
+    "System": {
+      "word": "System",
+      "type": "thing",
+      "parent": "Thing",
+      "children": [
+        "Solar",
+        "Digestive",
+        "Computer",
+        "Economic",
+        "Political",
+        "ecology"
+      ],
+      "traits": [
+        "complex"
+      ],
+      "acquaintances": [
+        "Computer",
+        "body",
+        "Solar",
+        "ecology",
+        "education"
+      ],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "traitsPromoted": true,
+        "rolesPromoted": false
+      }
+    },
+    "Place": {
+      "word": "Place",
+      "type": "thing",
+      "parent": "Thing",
+      "children": [
+        "zoo",
+        "habitat"
+      ],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Cat": {
+      "word": "Cat",
+      "type": "thing",
+      "parent": "Animal",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Dog": {
+      "word": "Dog",
+      "type": "thing",
+      "parent": "Animal",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Bird": {
+      "word": "Bird",
+      "type": "thing",
+      "parent": "Animal",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Fish": {
+      "word": "Fish",
+      "type": "thing",
+      "parent": "Animal",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Horse": {
+      "word": "Horse",
+      "type": "thing",
+      "parent": "Animal",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Furniture": {
+      "word": "Furniture",
+      "type": "thing",
+      "parent": "Object",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Vehicle": {
+      "word": "Vehicle",
+      "type": "thing",
+      "parent": "Object",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Tool": {
+      "word": "Tool",
+      "type": "thing",
+      "parent": "Object",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Container": {
+      "word": "Container",
+      "type": "thing",
+      "parent": "Object",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Device": {
+      "word": "Device",
+      "type": "thing",
+      "parent": "Object",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Idea": {
+      "word": "Idea",
+      "type": "thing",
+      "parent": "Concept",
+      "children": [
+        "function"
+      ],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Theory": {
+      "word": "Theory",
+      "type": "thing",
+      "parent": "Concept",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Belief": {
+      "word": "Belief",
+      "type": "thing",
+      "parent": "Concept",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Principle": {
+      "word": "Principle",
+      "type": "thing",
+      "parent": "Concept",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Value": {
+      "word": "Value",
+      "type": "thing",
+      "parent": "Concept",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Solar": {
+      "word": "Solar",
+      "type": "thing",
+      "parent": "System",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Digestive": {
+      "word": "Digestive",
+      "type": "thing",
+      "parent": "System",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Computer": {
+      "word": "Computer",
+      "type": "thing",
+      "parent": "System",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Economic": {
+      "word": "Economic",
+      "type": "thing",
+      "parent": "System",
+      "children": [
+        "ownership"
+      ],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "Political": {
+      "word": "Political",
+      "type": "thing",
+      "parent": "System",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": false,
+        "rawLogged": false,
+        "traitsPromoted": false,
+        "rolesPromoted": false
+      }
+    },
+    "item": {
+      "word": "item",
+      "type": "thing",
+      "parent": "Object",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    },
+    "possession": {
+      "word": "possession",
+      "type": "thing",
+      "parent": "Thing",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    },
+    "stuff": {
+      "word": "stuff",
+      "type": "thing",
+      "parent": "Thing",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    },
+    "belonging": {
+      "word": "belonging",
+      "type": "thing",
+      "parent": "Concept",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    },
+    "zoo": {
+      "word": "zoo",
+      "type": "thing",
+      "parent": "Place",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    },
+    "habitat": {
+      "word": "habitat",
+      "type": "thing",
+      "parent": "Place",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    },
+    "pet": {
+      "word": "pet",
+      "type": "thing",
+      "parent": "Animal",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    },
+    "wildlife": {
+      "word": "wildlife",
+      "type": "thing",
+      "parent": "Animal",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    },
+    "veterinarian": {
+      "word": "veterinarian",
+      "type": "thing",
+      "parent": "Thing",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    },
+    "shape": {
+      "word": "shape",
+      "type": "thing",
+      "parent": "Object",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    },
+    "material": {
+      "word": "material",
+      "type": "thing",
+      "parent": "Thing",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    },
+    "function": {
+      "word": "function",
+      "type": "thing",
+      "parent": "Idea",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    },
+    "use": {
+      "word": "use",
+      "type": "thing",
+      "parent": "Concept",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    },
+    "ownership": {
+      "word": "ownership",
+      "type": "thing",
+      "parent": "Economic",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    },
+    "notion": {
+      "word": "notion",
+      "type": "thing",
+      "parent": "Concept",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    },
+    "understanding": {
+      "word": "understanding",
+      "type": "thing",
+      "parent": "Concept",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    },
+    "body": {
+      "word": "body",
+      "type": "thing",
+      "parent": "Object",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    },
+    "ecology": {
+      "word": "ecology",
+      "type": "thing",
+      "parent": "System",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    },
+    "education": {
+      "word": "education",
+      "type": "thing",
+      "parent": "Concept",
+      "children": [],
+      "traits": [],
+      "acquaintances": [],
+      "purposes": [],
+      "stages": {
+        "childrenDone": true,
+        "rawLogged": true,
+        "orphanAdopted": true
+      }
+    }
+  },
+  "traits": {
+    "complex": {
+      "word": "complex",
+      "type": "trait",
+      "exemplars": [
+        "Animal",
+        "Concept",
+        "Object",
+        "System",
+        "Thing"
+      ],
+      "related_traits": []
+    },
+    "tangible": {
+      "word": "tangible",
+      "type": "trait",
+      "exemplars": [
+        "Animal",
+        "Concept",
+        "Object",
+        "Thing"
+      ],
+      "related_traits": []
+    },
+    "mobile": {
+      "word": "mobile",
+      "type": "trait",
+      "exemplars": [
+        "Animal",
+        "Concept"
+      ],
+      "related_traits": []
+    }
+  },
+  "roles": {},
+  "game_config": {
+    "daily_puzzle": {
+      "origin": "pet",
+      "destination": "Value",
+      "optimal_path_length": 6,
+      "date": "2025-06-26"
+    },
+    "difficulty_settings": {
+      "easy": 4,
+      "normal": 6,
+      "hard": 8,
+      "expert": 10
+    }
+  },
+  "stats": {
+    "total_words": 45,
+    "thing_words": 45,
+    "trait_words": 3,
+    "role_words": 0,
+    "total_nodes": 48
+  }
+}

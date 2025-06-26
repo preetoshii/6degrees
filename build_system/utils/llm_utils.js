@@ -2,6 +2,8 @@ import OpenAI from 'openai';
 import dotenv from 'dotenv';
 import { createLogger } from './logger.js';
 import { monitor } from './monitor.js';
+import { getSystemPrompt } from './prompt_loader.js';
+import { validateResponse, cleanResponseList } from './response_validator.js';
 
 dotenv.config();
 
@@ -64,12 +66,13 @@ async function retryWithBackoff(fn, config, context = '') {
 // Generate completion with retry
 export async function generateCompletion(prompt, config, context = '') {
   return await retryWithBackoff(async () => {
+    const systemPrompt = await getSystemPrompt();
     const response = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || 'gpt-4-turbo-preview',
       messages: [
         {
           role: 'system',
-          content: 'You are a helpful assistant that generates word associations for a semantic graph. Always respond with the exact format requested.'
+          content: systemPrompt
         },
         {
           role: 'user',
@@ -126,11 +129,26 @@ export async function generateEmbeddings(texts, config) {
 }
 
 // Parse LLM response for comma-separated values
-export function parseCSVResponse(response) {
-  return response
+export function parseCSVResponse(response, context = '') {
+  // First validate the response
+  const validation = validateResponse(response);
+  if (!validation.valid) {
+    logger.warn(`Invalid response for ${context}: ${validation.reason}`);
+    return [];
+  }
+  
+  // Handle NONE response
+  if (validation.cleaned === 'NONE') {
+    return [];
+  }
+  
+  // Parse and clean the response
+  const items = response
     .split(',')
     .map(item => item.trim())
     .filter(item => item.length > 0);
+    
+  return cleanResponseList(items, context);
 }
 
 // Validate response count

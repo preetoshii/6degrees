@@ -1,0 +1,157 @@
+[
+  {
+    "word": "Thing",
+    "type": "thing",
+    "parent": null,
+    "children": [
+      "Animal",
+      "Object",
+      "Concept",
+      "System",
+      "Place"
+    ],
+    "traits": [],
+    "acquaintances": [],
+    "purposes": [],
+    "stages": {
+      "childrenDone": true,
+      "rawLogged": true
+    }
+  },
+  {
+    "word": "Animal",
+    "type": "thing",
+    "parent": "Thing",
+    "children": [
+      "Cat",
+      "Dog",
+      "Bird",
+      "Fish",
+      "Horse"
+    ],
+    "traits": [],
+    "acquaintances": [],
+    "purposes": [],
+    "stages": {
+      "childrenDone": true,
+      "rawLogged": true
+    }
+  },
+  {
+    "word": "Object",
+    "type": "thing",
+    "parent": "Thing",
+    "children": [],
+    "traits": [],
+    "acquaintances": [],
+    "purposes": [],
+    "stages": {
+      "childrenDone": false,
+      "rawLogged": false
+    }
+  },
+  {
+    "word": "Concept",
+    "type": "thing",
+    "parent": "Thing",
+    "children": [],
+    "traits": [],
+    "acquaintances": [],
+    "purposes": [],
+    "stages": {
+      "childrenDone": false,
+      "rawLogged": false
+    }
+  },
+  {
+    "word": "System",
+    "type": "thing",
+    "parent": "Thing",
+    "children": [],
+    "traits": [],
+    "acquaintances": [],
+    "purposes": [],
+    "stages": {
+      "childrenDone": false,
+      "rawLogged": false
+    }
+  },
+  {
+    "word": "Place",
+    "type": "thing",
+    "parent": "Thing",
+    "children": [],
+    "traits": [],
+    "acquaintances": [],
+    "purposes": [],
+    "stages": {
+      "childrenDone": false,
+      "rawLogged": false
+    }
+  },
+  {
+    "word": "Cat",
+    "type": "thing",
+    "parent": "Animal",
+    "children": [],
+    "traits": [],
+    "acquaintances": [],
+    "purposes": [],
+    "stages": {
+      "childrenDone": false,
+      "rawLogged": false
+    }
+  },
+  {
+    "word": "Dog",
+    "type": "thing",
+    "parent": "Animal",
+    "children": [],
+    "traits": [],
+    "acquaintances": [],
+    "purposes": [],
+    "stages": {
+      "childrenDone": false,
+      "rawLogged": false
+    }
+  },
+  {
+    "word": "Bird",
+    "type": "thing",
+    "parent": "Animal",
+    "children": [],
+    "traits": [],
+    "acquaintances": [],
+    "purposes": [],
+    "stages": {
+      "childrenDone": false,
+      "rawLogged": false
+    }
+  },
+  {
+    "word": "Fish",
+    "type": "thing",
+    "parent": "Animal",
+    "children": [],
+    "traits": [],
+    "acquaintances": [],
+    "purposes": [],
+    "stages": {
+      "childrenDone": false,
+      "rawLogged": false
+    }
+  },
+  {
+    "word": "Horse",
+    "type": "thing",
+    "parent": "Animal",
+    "children": [],
+    "traits": [],
+    "acquaintances": [],
+    "purposes": [],
+    "stages": {
+      "childrenDone": false,
+      "rawLogged": false
+    }
+  }
+]

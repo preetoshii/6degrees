@@ -1,0 +1,11 @@
+# Phase 3: Parent-Child Validation Prompt
+# Used in: phase3_acquaintance_adoption.js
+# Purpose: Validate if a parent-child relationship is semantically correct
+# Variables: {{orphan}}, {{parent}}
+# Returns: "yes" or "no" only
+
+Is "{{orphan}}" a kind of "{{parent}}"? 
+
+Consider whether the statement "{{orphan}} is a type of {{parent}}" makes logical and semantic sense.
+
+Answer yes or no only.

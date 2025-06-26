@@ -1,14 +1,14 @@
 {
   "checkpoint_version": "1.0",
-  "timestamp": "2025-06-26T18:08:07.415Z",
+  "timestamp": "2025-06-26T20:24:03.608Z",
   "phase": "3_5",
   "data": {
     "phase_complete": true,
-    "total_words": 94,
-    "thing_words": 94,
-    "trait_words": 4,
-    "role_words": 2,
-    "total_nodes": 100,
+    "total_words": 45,
+    "thing_words": 45,
+    "trait_words": 3,
+    "role_words": 0,
+    "total_nodes": 48,
     "duplicates_found": 0
   },
   "stats": {

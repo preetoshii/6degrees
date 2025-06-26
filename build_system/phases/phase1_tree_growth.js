@@ -4,6 +4,7 @@ import { generateCompletion, parseCSVResponse, validateResponseCount, checkExclu
 import { normalize, isAncestor, generateExclusionList, findWord } from '../utils/word_utils.js';
 import { createLogger } from '../utils/logger.js';
 import { monitor } from '../utils/monitor.js';
+import { loadPrompt } from '../utils/prompt_loader.js';
 
 const logger = createLogger('Phase1');
 
@@ -58,11 +59,20 @@ async function generateChildren(word, config) {
     return mockChildren[word.word] || ["Child1", "Child2", "Child3"];
   }
   
-  const prompt = `List ${config.itemCounts.children.min}-${config.itemCounts.children.max} common subtypes of ${word.word}, ranked by commonality.
-Return comma-separated nouns only. Count should be between ${config.itemCounts.children.min}-${config.itemCounts.children.max} based on how many strong examples exist.`;
+  const prompt = await loadPrompt('phase1_children.txt', {
+    min: config.itemCounts.children.min,
+    max: config.itemCounts.children.max,
+    word: word.word
+  });
   
   const response = await generateCompletion(prompt, config, `children for ${word.word}`);
-  const children = parseCSVResponse(response);
+  const children = parseCSVResponse(response, `children for ${word.word}`);
+  
+  // If we got no children due to error response, use fallback for "Thing"
+  if (children.length === 0 && word.word === 'Thing') {
+    await logger.warn('Using fallback children for Thing due to API confusion');
+    return ['Animal', 'Object', 'Concept', 'System', 'Place'];
+  }
   
   return validateResponseCount(
     children, 
@@ -79,11 +89,14 @@ async function generateTraits(word, config) {
     return ["trait1", "trait2", "trait3", "trait4"];
   }
   
-  const prompt = `List ${config.itemCounts.traits.min}-${config.itemCounts.traits.max} adjectives most people associate with ${word.word}, ranked by frequency.
-Return comma-separated adjectives only. Count should be between ${config.itemCounts.traits.min}-${config.itemCounts.traits.max} based on salience.`;
+  const prompt = await loadPrompt('phase1_traits.txt', {
+    min: config.itemCounts.traits.min,
+    max: config.itemCounts.traits.max,
+    word: word.word
+  });
   
   const response = await generateCompletion(prompt, config, `traits for ${word.word}`);
-  const traits = parseCSVResponse(response);
+  const traits = parseCSVResponse(response, `traits for ${word.word}`);
   
   return validateResponseCount(
     traits,
@@ -101,12 +114,15 @@ async function generateAcquaintances(word, exclusions, config) {
   }
   
   const exclusionList = exclusions.join(', ');
-  const prompt = `List ${config.itemCounts.acquaintances.min}-${config.itemCounts.acquaintances.max} nouns that co-occur with ${word.word} in thought/experience,
-excluding ${exclusionList}.
-Return comma-separated nouns only. Count should be between ${config.itemCounts.acquaintances.min}-${config.itemCounts.acquaintances.max} based on strength of association.`;
+  const prompt = await loadPrompt('phase1_acquaintances.txt', {
+    min: config.itemCounts.acquaintances.min,
+    max: config.itemCounts.acquaintances.max,
+    word: word.word,
+    exclusionList: exclusionList
+  });
   
   const response = await generateCompletion(prompt, config, `acquaintances for ${word.word}`);
-  let acquaintances = parseCSVResponse(response);
+  let acquaintances = parseCSVResponse(response, `acquaintances for ${word.word}`);
   
   // Check for exclusions
   acquaintances = checkExclusions(acquaintances, exclusions);
@@ -114,9 +130,12 @@ Return comma-separated nouns only. Count should be between ${config.itemCounts.a
   // Retry once if we have exclusions
   if (acquaintances.length < config.itemCounts.acquaintances.min) {
     console.warn(`Retrying acquaintances for ${word.word} due to exclusions`);
-    const retryPrompt = prompt + `\nDo not include any of these words: ${exclusionList}`;
+    const retryPrompt = await loadPrompt('phase1_acquaintances_retry.txt', {
+      prompt: prompt,
+      exclusionList: exclusionList
+    });
     const retryResponse = await generateCompletion(retryPrompt, config, `acquaintances retry for ${word.word}`);
-    acquaintances = checkExclusions(parseCSVResponse(retryResponse), exclusions);
+    acquaintances = checkExclusions(parseCSVResponse(retryResponse, `acquaintances retry for ${word.word}`), exclusions);
   }
   
   return acquaintances;
@@ -134,8 +153,11 @@ async function generateRoles(word, config) {
     return mockRoles[word.word] || [];
   }
   
-  const prompt = `Does ${word.word} represent an entity whose primary identity is defined by a function, service, or purpose in the world? Key signals: concrete tools, professions, social roles, systems with active effects. If yes, list the ${config.itemCounts.roles.min}-${config.itemCounts.roles.max} most salient roles — the ones most people intuitively think of first when they consider ${word.word}. Order them by likelihood. If no clear purpose, return NONE.
-Return comma-separated nouns or NONE only.`;
+  const prompt = await loadPrompt('phase1_roles.txt', {
+    min: config.itemCounts.roles.min || 1,
+    max: config.itemCounts.roles.max || 3,
+    word: word.word
+  });
   
   const response = await generateCompletion(prompt, config, `roles for ${word.word}`);
   
@@ -143,8 +165,8 @@ Return comma-separated nouns or NONE only.`;
     return [];
   }
   
-  const roles = parseCSVResponse(response);
-  return roles.slice(0, config.itemCounts.roles.max); // Ensure we don't exceed max
+  const roles = parseCSVResponse(response, `roles for ${word.word}`);
+  return roles.slice(0, config.itemCounts.roles.max || 3); // Ensure we don't exceed max
 }
 
 // Process a single word
@@ -311,8 +333,21 @@ export async function runPhase1(config) {
   console.log(`Queue has ${queue.length} words to process`);
   console.log(`Target word count: ${config.targetWordCount}`);
   
+  // Count fully processed words
+  const getFullyProcessedCount = () => {
+    return masterWords.filter(w => w.stages.childrenDone && w.stages.rawLogged).length;
+  };
+  
   // BFS expansion loop
-  while (queue.length > 0 && masterWords.length < config.targetWordCount) {
+  while (queue.length > 0) {
+    const fullyProcessedCount = getFullyProcessedCount();
+    
+    // Check if we've reached our target of fully processed words
+    if (fullyProcessedCount >= config.targetWordCount) {
+      console.log(`Reached target of ${config.targetWordCount} fully processed words`);
+      break;
+    }
+    
     const currentWordName = queue.shift();
     const currentWord = findWord(currentWordName, masterWords);
     
@@ -328,7 +363,13 @@ export async function runPhase1(config) {
     await processWord(currentWord, masterWords, config, queue, stats);
     
     if (config.verbose) {
-      console.log(`Progress: ${masterWords.length}/${config.targetWordCount} words, ${queue.length} in queue`);
+      const newFullyProcessedCount = getFullyProcessedCount();
+      console.log(`📊 Progress: ${newFullyProcessedCount}/${config.targetWordCount} fully processed, ${masterWords.length} total words, ${queue.length} in queue`);
+    } else {
+      // Always show some progress
+      const newFullyProcessedCount = getFullyProcessedCount();
+      const percentage = Math.round((newFullyProcessedCount / config.targetWordCount) * 100);
+      console.log(`🔄 Phase 1 Progress: ${percentage}% (${newFullyProcessedCount}/${config.targetWordCount} words complete)`);
     }
   }
   
@@ -340,7 +381,8 @@ export async function runPhase1(config) {
     ...stats
   });
   
-  console.log(`Phase 1 complete: ${masterWords.length} words generated`);
+  const finalFullyProcessedCount = getFullyProcessedCount();
+  console.log(`Phase 1 complete: ${finalFullyProcessedCount} fully processed words (${masterWords.length} total)`);
   console.log(`API calls made: ${stats.api_calls_made}`);
   console.log(`Errors encountered: ${stats.errors_encountered}`);
   

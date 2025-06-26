@@ -2,6 +2,7 @@ import { readJSON, writeJSON, readCSV, saveCheckpoint, loadCheckpoint,
          MASTER_WORDS_PATH, RAW_ACQUAINTANCES_PATH, ROLES_MASTER_PATH } from '../utils/file_utils.js';
 import { generateEmbeddings, generateCompletion, rateLimit } from '../utils/llm_utils.js';
 import { normalize, findWord, wouldCreateCycle, findNearestNeighbors, buildWordIndex } from '../utils/word_utils.js';
+import { loadPrompt } from '../utils/prompt_loader.js';
 
 // Build extended candidate strings for better semantic matching
 function buildCandidateStrings(masterWords) {
@@ -16,11 +17,11 @@ function buildCandidateStrings(masterWords) {
 async function findBestParent(orphan, shortlist, config) {
   const candidatesList = shortlist.map(s => s.word).join(', ');
   
-  const prompt = `I have ${shortlist.length} potential parent categories for "${orphan}":
-${candidatesList}
-
-Which single category best serves as the parent for "${orphan}"?
-Reply with exactly one choice from the list.`;
+  const prompt = await loadPrompt('phase3_best_parent.txt', {
+    count: shortlist.length,
+    orphan: orphan,
+    candidatesList: candidatesList
+  });
   
   const response = await generateCompletion(prompt, config, `parent selection for ${orphan}`);
   const selected = response.trim();
@@ -37,7 +38,10 @@ Reply with exactly one choice from the list.`;
 
 // Validate parent-child relationship
 async function validateParentChild(orphan, parent, config) {
-  const prompt = `Is "${orphan}" a kind of "${parent}"? Answer yes or no only.`;
+  const prompt = await loadPrompt('phase3_validate_parent.txt', {
+    orphan: orphan,
+    parent: parent
+  });
   const response = await generateCompletion(prompt, config, `validation for ${orphan} -> ${parent}`);
   
   return response.toLowerCase().includes('yes');

@@ -1,17 +1,17 @@
 {
   "checkpoint_version": "1.0",
-  "timestamp": "2025-06-26T18:04:55.673Z",
+  "timestamp": "2025-06-26T20:50:28.756Z",
   "phase": 1,
   "data": {
     "phase_complete": true,
-    "total_words": 51,
-    "words_processed": 27,
+    "total_words": 113,
+    "words_processed": 74,
     "errors_encountered": 0,
-    "api_calls_made": 40
+    "api_calls_made": 220
   },
   "stats": {
-    "words_processed": 27,
+    "words_processed": 74,
     "errors_encountered": 0,
-    "api_calls_made": 40
+    "api_calls_made": 220
   }
 }

@@ -1,0 +1,23 @@
+# Phase 1: Traits Generation Prompt
+# Used in: phase1_tree_growth.js
+# Purpose: Generate adjective traits associated with a word
+# Variables: {{min}}, {{max}}, {{word}}
+# Returns: Comma-separated list of adjectives
+
+List {{min}}-{{max}} adjectives commonly used to describe "{{word}}" as a general category.
+
+Requirements:
+- Think about qualities that apply to ALL instances of {{word}}
+- If "{{word}}" is "Thing" (the most abstract), use universal qualities like: diverse, varied, tangible, abstract, real
+- For categories, think broadly about shared characteristics
+- Must be actual adjectives (not nouns or verbs)
+- Focus on universal, culturally-neutral associations
+
+Return exactly {{min}}-{{max}} comma-separated adjectives only.
+
+Examples:
+- For "Thing": diverse, varied, tangible, abstract, real
+- For "System": complex, organized, interconnected, dynamic, structured
+- For "Animal": living, mobile, sentient, organic, instinctive
+- For "Cat": furry, agile, independent, curious, playful
+- For "Object": solid, tangible, physical, useful, material

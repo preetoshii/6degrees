@@ -1,0 +1,21 @@
+# Phase 2.5: Role Acquaintances Generation Prompt
+# Used in: phase2_5_role_normalization.js
+# Purpose: Generate acquaintances specifically for promoted role words
+# Variables: {{min}}, {{max}}, {{role}}
+# Returns: Comma-separated list of nouns
+
+List {{min}}-{{max}} nouns that symbolically or functionally relate to the role/purpose of {{role}}.
+
+Requirements:
+- Include tools, objects, or contexts used in {{role}}
+- Include results or outcomes of {{role}}
+- Include places or situations where {{role}} happens
+- These help players navigate via functional associations
+- Must be concrete nouns, not abstract concepts
+
+Return comma-separated nouns only. Count should be between {{min}}-{{max}} based on strength of association.
+
+Examples:
+- For "illuminating": lamp, bulb, darkness, switch, glow
+- For "teaching": classroom, textbook, student, lesson, blackboard
+- For "protecting": shield, armor, guardian, barrier, safety

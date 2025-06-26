@@ -1,0 +1,11 @@
+# Phase 1: Acquaintances Retry Prompt
+# Used in: phase1_tree_growth.js  
+# Purpose: Retry acquaintances generation with stricter exclusion enforcement
+# Variables: {{prompt}}, {{exclusionList}}
+# Returns: Comma-separated list of nouns
+
+{{prompt}}
+
+IMPORTANT: Do not include any of these words: {{exclusionList}}
+
+The response must contain completely different words not in the exclusion list.

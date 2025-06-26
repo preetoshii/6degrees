@@ -2,6 +2,7 @@ import { readJSON, writeJSON, readCSV, saveCheckpoint, loadCheckpoint,
          MASTER_WORDS_PATH, ROLES_MASTER_PATH, RAW_PURPOSES_PATH } from '../utils/file_utils.js';
 import { generateEmbeddings, generateCompletion, parseCSVResponse, rateLimit } from '../utils/llm_utils.js';
 import { normalize, calculateSimilarity } from '../utils/word_utils.js';
+import { loadPrompt } from '../utils/prompt_loader.js';
 
 // Cluster roles using embeddings
 async function clusterRoles(roles, embeddings, threshold) {
@@ -55,9 +56,11 @@ function selectCanonical(cluster, roles, roleCounts) {
 
 // Generate acquaintances for a role
 async function generateRoleAcquaintances(role, config) {
-  const prompt = `List ${config.itemCounts.acquaintances.min}-${config.itemCounts.acquaintances.max} nouns that symbolically or functionally relate to the role/purpose of ${role}.
-These should be concepts, objects, or ideas associated with ${role} as a function or purpose.
-Return comma-separated nouns only. Count should be between ${config.itemCounts.acquaintances.min}-${config.itemCounts.acquaintances.max} based on strength of association.`;
+  const prompt = await loadPrompt('phase2_5_role_acquaintances.txt', {
+    min: config.itemCounts.acquaintances.min,
+    max: config.itemCounts.acquaintances.max,
+    role: role
+  });
   
   const response = await generateCompletion(prompt, config, `role acquaintances for ${role}`);
   const acquaintances = parseCSVResponse(response);

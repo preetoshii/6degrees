@@ -1,0 +1,24 @@
+# Phase 1: Acquaintances Generation Prompt
+# Used in: phase1_tree_growth.js
+# Purpose: Generate co-occurring nouns (acquaintances) for a word
+# Variables: {{min}}, {{max}}, {{word}}, {{exclusionList}}
+# Returns: Comma-separated list of nouns
+
+List {{min}}-{{max}} nouns that people commonly associate with "{{word}}" in thought or experience.
+
+Requirements:
+- Things that naturally come to mind when thinking of {{word}}
+- NOT subtypes, traits, or synonyms of {{word}}
+- If "{{word}}" is "Thing", use universal associations like: existence, reality, matter, universe, world
+- For abstract words, think of related concepts or contexts
+- For concrete words, think of associated objects or situations
+- Must be culturally universal associations
+- Exclude these already used words: {{exclusionList}}
+
+Return exactly {{min}}-{{max}} comma-separated nouns only.
+
+Examples:
+- For "Thing": existence, reality, matter, universe, world
+- For "Cat": whiskers, yarn, scratching post, meow, windowsill
+- For "System": process, structure, network, framework, organization  
+- For "Vehicle": road, driver, fuel, journey, garage

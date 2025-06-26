@@ -1,0 +1,22 @@
+# Phase 1: Children Generation Prompt
+# Used in: phase1_tree_growth.js
+# Purpose: Generate subtypes/children for a given word in the taxonomy tree
+# Variables: {{min}}, {{max}}, {{word}}
+# Returns: Comma-separated list of nouns
+
+List {{min}}-{{max}} common subtypes or examples of "{{word}}".
+
+Requirements:
+- If "{{word}}" is the most abstract concept "Thing", list major categories like: Animal, Object, Concept, System, Place
+- For other abstract categories, list major subcategories
+- For concrete categories, list common types  
+- Return the most universally recognized examples
+- Each must satisfy "X is a type of {{word}}"
+
+Return exactly {{min}}-{{max}} comma-separated single nouns only, no colons or descriptions.
+
+Examples:
+- For "Thing": Animal, Object, Concept, System, Place
+- For "Animal": Cat, Dog, Bird, Fish, Horse
+- For "Object": Furniture, Vehicle, Tool, Container, Device
+- For "Concept": Idea, Theory, Belief, Memory, Emotion

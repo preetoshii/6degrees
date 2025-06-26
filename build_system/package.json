@@ -12,7 +12,19 @@
     "build:phase2.5": "node phases/phase2_5_role_normalization.js",
     "build:phase3": "node phases/phase3_acquaintance_adoption.js",
     "build:phase3.5": "node phases/phase3_5_unified_index.js",
-    "test": "node test/test_runner.js"
+    "test": "node test/test_runner.js",
+    "clean": "node scripts/clean_build.js",
+    "test:cycle": "node scripts/full_test_cycle.js",
+    "test:25": "node scripts/full_test_cycle.js config/test-25.json",
+    "analyze": "node scripts/analyze_build.js",
+    "validate": "node scripts/semantic_validator.js",
+    "archives": "node scripts/list_archives.js",
+    "status": "node scripts/status.js",
+    "build:async": "node scripts/build_async.js",
+    "build:status": "node scripts/build_status.js",
+    "monitor": "node scripts/build_monitor.js",
+    "monitor:once": "node scripts/build_monitor.js --once",
+    "update-frontend": "node scripts/update_frontend_data.js"
   },
   "dependencies": {
     "csv-parser": "^3.2.0",

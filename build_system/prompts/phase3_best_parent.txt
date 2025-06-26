@@ -1,0 +1,17 @@
+# Phase 3: Best Parent Selection Prompt
+# Used in: phase3_acquaintance_adoption.js
+# Purpose: Select the best parent category from a shortlist for an orphan word
+# Variables: {{count}}, {{orphan}}, {{candidatesList}}
+# Returns: Exactly one choice from the provided list
+
+I have {{count}} potential parent categories for "{{orphan}}":
+{{candidatesList}}
+
+Requirements:
+- Choose the category that {{orphan}} most naturally belongs to
+- Consider semantic relationships, not just surface similarity
+- The relationship "{{orphan}} is a type of [parent]" should make intuitive sense
+- If multiple seem valid, choose the most specific one that still makes sense
+
+Which single category best serves as the parent for "{{orphan}}"?
+Reply with exactly one choice from the list above, nothing else.

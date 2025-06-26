@@ -1,0 +1,34 @@
+{
+  "complex": {
+    "word": "complex",
+    "type": "trait",
+    "exemplars": [
+      "Animal",
+      "Concept",
+      "Object",
+      "System",
+      "Thing"
+    ],
+    "related_traits": []
+  },
+  "tangible": {
+    "word": "tangible",
+    "type": "trait",
+    "exemplars": [
+      "Animal",
+      "Concept",
+      "Object",
+      "Thing"
+    ],
+    "related_traits": []
+  },
+  "mobile": {
+    "word": "mobile",
+    "type": "trait",
+    "exemplars": [
+      "Animal",
+      "Concept"
+    ],
+    "related_traits": []
+  }
+}

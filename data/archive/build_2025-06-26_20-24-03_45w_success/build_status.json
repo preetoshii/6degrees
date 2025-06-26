@@ -1,0 +1,14 @@
+{
+  "build_date": "2025-06-26T20:24:03.722Z",
+  "success": true,
+  "words_built": 45,
+  "has_unified": true,
+  "error": "",
+  "stats": {
+    "total_words": 45,
+    "thing_words": 45,
+    "trait_words": 3,
+    "role_words": 0,
+    "total_nodes": 48
+  }
+}
