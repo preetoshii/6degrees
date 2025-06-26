@@ -201,6 +201,15 @@ async function analyzeBuild() {
   
   console.log(`\nArchive this build? (y/n)`);
   
+  // Instructions for Claude Code
+  console.log('\n=== INSTRUCTIONS FOR CLAUDE CODE ===');
+  console.log('Please perform the following manual tests:');
+  console.log('1. Test 5-10 random word paths for semantic sense');
+  console.log('2. Evaluate trait/acquaintance quality sampling');
+  console.log('3. Write a detective analysis if issues found');
+  console.log('4. Update build_analysis.md with your findings');
+  console.log('=====================================\n');
+  
   return { analysis, buildName, archivePath };
 }
 
